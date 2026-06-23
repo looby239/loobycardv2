@@ -1,0 +1,730 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '@/lib/supabase';
+import { CardData } from '@/types/card';
+import '@/styles/templates/template-12.css';
+
+interface TemplateProps {
+  card: CardData;
+  previewMode?: boolean;
+}
+
+interface Wish {
+  id: number;
+  guest_name: string;
+  message: string;
+  created_at: string;
+}
+
+export default function Template12({ card, previewMode = false }: TemplateProps) {
+  const [opened, setOpened] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [wishes, setWishes] = useState<Wish[]>([]);
+  const [loadingWishes, setLoadingWishes] = useState(false);
+  const [giftModalOpen, setGiftModalOpen] = useState(false);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+
+  // RSVP Form state
+  const [rsvpName, setRsvpName] = useState('');
+  const [rsvpStatus, setRsvpStatus] = useState('yes');
+  const [rsvpCount, setRsvpCount] = useState(0);
+  const [rsvpSuccess, setRsvpSuccess] = useState(false);
+  const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
+
+  // Guestbook Form state
+  const [wishName, setWishName] = useState('');
+  const [wishText, setWishText] = useState('');
+  const [wishSuccess, setWishSuccess] = useState(false);
+  const [wishSubmitting, setWishSubmitting] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (previewMode) {
+      setWishes([
+        { id: 1, guest_name: 'Minh Thảo & Hoàng Nam', message: 'Chúc hai em trăm năm hạnh phúc, mãi mãi bên nhau đầu bạc răng long nhé! Chúc mừng hạnh phúc gia đình mới.', created_at: new Date().toISOString() },
+        { id: 2, guest_name: 'Anh Tiến Đạt', message: 'Chúc mừng ngày trọng đại của Thành Lộc và Minh Thư! Rất vui được đến chung vui cùng gia đình.', created_at: new Date().toISOString() },
+      ]);
+      return;
+    }
+
+    const fetchWishes = async () => {
+      setLoadingWishes(true);
+      try {
+        const { data, error } = await supabase
+          .from('guest_messages')
+          .select('id, guest_name, message, created_at')
+          .eq('card_id', card.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setWishes(data);
+      } catch (err) {
+        console.error('Error fetching guest wishes:', err);
+      } finally {
+        setLoadingWishes(false);
+      }
+    };
+
+    fetchWishes();
+  }, [card.id, previewMode]);
+
+  useEffect(() => {
+    if (!card.event_date) return;
+    const weddingTime = new Date(card.event_date).getTime();
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = weddingTime - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [card.event_date]);
+
+  const handleOpenEnvelope = () => {
+    setOpened(true);
+    if (card.music_url && audioRef.current) {
+      audioRef.current.play().then(() => {
+        setMusicPlaying(true);
+      }).catch((err) => {
+        console.log('Audio autoplay blocked by browser:', err);
+      });
+    }
+  };
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (musicPlaying) {
+      audioRef.current.pause();
+      setMusicPlaying(false);
+    } else {
+      audioRef.current.play();
+      setMusicPlaying(true);
+    }
+  };
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (previewMode) {
+      alert('Chế độ xem thử: Không ghi nhận phản hồi.');
+      return;
+    }
+
+    setRsvpSubmitting(true);
+    try {
+      const res = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_id: card.id,
+          guest_name: rsvpName,
+          attend_status: rsvpStatus,
+          guests_count: rsvpCount,
+          message: 'RSVP: Gửi phản hồi xác nhận',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRsvpSuccess(true);
+        alert('Phản hồi RSVP của bạn đã được gửi thành công!');
+      } else {
+        alert(data.error || 'Lỗi gửi phản hồi.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi kết nối gửi RSVP.');
+    } finally {
+      setRsvpSubmitting(false);
+    }
+  };
+
+  const handleWishSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wishName.trim() || !wishText.trim()) return;
+
+    if (previewMode) {
+      const newWish = {
+        id: Date.now(),
+        guest_name: wishName,
+        message: wishText,
+        created_at: new Date().toISOString(),
+      };
+      setWishes([newWish, ...wishes]);
+      setWishName('');
+      setWishText('');
+      setWishSuccess(true);
+      return;
+    }
+
+    setWishSubmitting(true);
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_id: card.id,
+          guest_name: wishName,
+          message: wishText,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        const newWishObj = {
+          id: data.data.id || Date.now(),
+          guest_name: wishName,
+          message: wishText,
+          created_at: new Date().toISOString(),
+        };
+        setWishes([newWishObj, ...wishes]);
+        setWishName('');
+        setWishText('');
+        setWishSuccess(true);
+      } else {
+        alert(data.error || 'Lỗi gửi lời chúc.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi kết nối gửi lời chúc.');
+    } finally {
+      setWishSubmitting(false);
+    }
+  };
+
+  const getQR = (bank?: string | null, acc?: string | null, holder?: string | null) => {
+    if (!bank || !acc) return '';
+    const name = holder || '';
+    const memo = `Mung cuoi ${card.groom_name} ${card.bride_name}`;
+    return `https://img.vietqr.io/image/${bank}-${acc}-compact2.png?amount=0&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(name)}`;
+  };
+
+  // Calendar builder helper
+  const getCalendar = () => {
+    if (!card.event_date) return null;
+    const date = new Date(card.event_date);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    // 0 = Sunday, 1 = Monday...
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    
+    // We want weeks aligned to standard grid: CN, T2, T3, T4, T5, T6, T7
+    const blanks = Array(firstDayIndex).fill(null);
+    const days = Array.from({ length: totalDays }, (_, i) => i + 1);
+    const allDays = [...blanks, ...days];
+    
+    const weeks: (number | null)[][] = [];
+    for (let i = 0; i < allDays.length; i += 7) {
+      weeks.push(allDays.slice(i, i + 7));
+    }
+    
+    return {
+      year,
+      month: month + 1,
+      weeks,
+      targetDay: date.getDate()
+    };
+  };
+
+  const calData = getCalendar();
+  const coverImage = card.cover_image_url || '/assets/images/template-12/photo1.webp';
+  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : [
+    '/assets/images/template-12/photo2.webp',
+    '/assets/images/template-12/photo3.webp',
+    '/assets/images/template-12/photo4.webp',
+    '/assets/images/template-12/photo5.webp',
+  ];
+
+  const mapIframeSrc = card.map_url && card.map_url.includes('google.com/maps') 
+    ? card.map_url 
+    : `https://maps.google.com/maps?q=${encodeURIComponent(card.venue_address || card.venue_name || '')}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+
+  return (
+    <div className="t12-wrapper">
+      {/* Background Music */}
+      {card.music_url && (
+        <audio id="bg-music" ref={audioRef} src={card.music_url} loop></audio>
+      )}
+
+      {/* Envelope Overlay Screen */}
+      <div className={`envelope-overlay ${opened ? 'open' : ''}`} id="envelope-overlay">
+        {/* Floating '囍' particles container */}
+        <div className="particles-container" id="particles-container">
+          <div className="particle" style={{ left: '10%', animationDelay: '0s' }}>囍</div>
+          <div className="particle" style={{ left: '30%', animationDelay: '2s' }}>囍</div>
+          <div className="particle" style={{ left: '50%', animationDelay: '4s' }}>囍</div>
+          <div className="particle" style={{ left: '70%', animationDelay: '1s' }}>囍</div>
+          <div className="particle" style={{ left: '90%', animationDelay: '3s' }}>囍</div>
+        </div>
+
+        <div className="envelope-card">
+          <div className="envelope-seal">
+            <span className="seal-character">囍</span>
+          </div>
+          <div className="envelope-inner">
+            {/* Corner decorations */}
+            <img src="/assets/images/template-12/hoa.svg" className="decor top-left" alt="" />
+            <img src="/assets/images/template-12/hoa.svg" className="decor bottom-right" alt="" />
+
+            <div className="envelope-content">
+              <h1 className="couple-names-cover">{card.groom_name} <span>&amp;</span> {card.bride_name}</h1>
+              <div className="divider">❦</div>
+              <div className="wedding-date-cover">
+                {card.event_date ? new Date(card.event_date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Ngày Lễ Thành Hôn'}
+              </div>
+              <p className="envelope-invite">Thân Mời</p>
+              <button className="btn-open-card" id="btn-open-card" onClick={handleOpenEnvelope}>
+                <span>Mở thiệp</span>
+                <div className="btn-shine"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Music toggle button */}
+      {card.music_url && (
+        <button className={`music-toggle ${musicPlaying ? 'playing' : ''}`} id="music-toggle" style={{ display: opened ? 'flex' : 'none' }} onClick={toggleMusic}>
+          <i className={musicPlaying ? "fas fa-volume-up" : "fas fa-volume-mute"}></i>
+        </button>
+      )}
+
+      {/* Main Invitation Content */}
+      <div className="template-container" id="main-container" style={{ display: opened ? 'block' : 'none' }}>
+        {/* Top floral decorations */}
+        <img src="/assets/images/template-12/hoa.svg" className="bg-decor-top" alt="" />
+
+        {/* Header / Intro Section */}
+        <header className="wedding-header">
+          <div className="header-intro">
+            <div className="intro-column">
+              <span className="role">{card.groom_role || 'Chú Rể'}</span>
+              <span className="name">{card.groom_name}</span>
+            </div>
+            <div className="intro-divider">
+              <span className="divider-icon">囍</span>
+            </div>
+            <div className="intro-column">
+              <span className="role">{card.bride_role || 'Cô Dâu'}</span>
+              <span className="name">{card.bride_name}</span>
+            </div>
+          </div>
+          <div className="hero-frame-container">
+            <div className="hero-frame">
+              <img src={coverImage} alt="Ảnh cưới" className="hero-image" />
+            </div>
+          </div>
+        </header>
+
+        {/* Parents Info Section */}
+        <section className="parents-info">
+          <h2 className="section-gold-title">THÔNG TIN LỄ CƯỚI</h2>
+          <div className="parents-grid">
+            <div className="family-column">
+              <h3>Nhà Trai</h3>
+              {card.groom_father_name && <p className="parent-name">Ông: {card.groom_father_name}</p>}
+              {card.groom_mother_name && <p className="parent-name">Bà: {card.groom_mother_name}</p>}
+              {card.groom_address && <p className="parent-address"><i className="fas fa-map-marker-alt"></i> {card.groom_address}</p>}
+            </div>
+            <div className="family-column">
+              <h3>Nhà Gái</h3>
+              {card.bride_father_name && <p className="parent-name">Ông: {card.bride_father_name}</p>}
+              {card.bride_mother_name && <p className="parent-name">Bà: {card.bride_mother_name}</p>}
+              {card.bride_address && <p className="parent-address"><i className="fas fa-map-marker-alt"></i> {card.bride_address}</p>}
+            </div>
+          </div>
+
+          <div className="ceremony-announcement">
+            <div className="gold-divider"></div>
+            <p className="announcement-text">TRÂN TRỌNG BÁO TIN LỄ THÀNH HÔN CỦA CHÚNG TÔI</p>
+            <h1 className="couple-names-vertical">
+              <span className="groom-name">{card.groom_name}</span>
+              <span className="and-symbol">&amp;</span>
+              <span className="bride-name">{card.bride_name}</span>
+            </h1>
+            <div className="gold-divider"></div>
+          </div>
+
+          {/* Home Ceremony Details */}
+          <div className="ceremony-card">
+            <h3>LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI TƯ GIA</h3>
+            <p className="ceremony-time">VÀO LÚC {card.ceremony_time || '09:00'}</p>
+            <p className="ceremony-date">
+              {card.event_date ? new Date(card.event_date).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'Ngày lễ'}
+            </p>
+            <p className="lunar-date">{card.invitation_text}</p>
+          </div>
+        </section>
+
+        {/* Photo Album Section */}
+        {albumImages.length > 0 && (
+          <section className="gallery">
+            <h2 className="section-gold-title">Album Ảnh Cưới</h2>
+            <p className="section-subtitle">Tình yêu ngọt ngào qua những khung hình</p>
+            <div className="gallery-grid">
+              {albumImages.slice(0, 4).map((imgUrl, i) => {
+                if (i === 3 && albumImages.length > 4) {
+                  return (
+                    <div key={i} className="gallery-item overlay-item" id="gallery-more-trigger" onClick={() => setLightboxImg(imgUrl)}>
+                      <img src={imgUrl} alt={`Gallery ${i + 1}`} className="gallery-img" />
+                      <div className="more-overlay">
+                        <span>+{albumImages.length - 4} ảnh</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div key={i} className="gallery-item" onClick={() => setLightboxImg(imgUrl)}>
+                    <img src={imgUrl} alt={`Gallery ${i + 1}`} className="gallery-img" />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Wedding Party Info Section */}
+        <section className="party-info">
+          <h2 className="section-gold-title">THÔNG TIN TIỆC CƯỚI</h2>
+          <p className="party-intro-text">Tiệc cưới sẽ diễn ra vào lúc:</p>
+          <div className="party-time-badge">
+            <span className="time">{card.ceremony_time || '18:00'}</span>
+            <span className="divider">|</span>
+            <span className="date">{card.event_date ? new Date(card.event_date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '00/00/0000'}</span>
+          </div>
+          {/* <p className="lunar-date">(Tức ngày 17 tháng 06 năm Bính Ngọ)</p> */}
+
+          {/* Countdown Widget */}
+          <div className="countdown-section">
+            <h3 className="widget-title">CÙNG ĐẾM NGƯỢC</h3>
+            <div className="countdown-container" id="countdown">
+              <div className="countdown-item">
+                <span id="days">{timeLeft.days.toString().padStart(2, '0')}</span>
+                <small>Ngày</small>
+              </div>
+              <div className="countdown-item">
+                <span id="hours">{timeLeft.hours.toString().padStart(2, '0')}</span>
+                <small>Giờ</small>
+              </div>
+              <div className="countdown-item">
+                <span id="mins">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                <small>Phút</small>
+              </div>
+              <div className="countdown-item">
+                <span id="secs">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                <small>Giây</small>
+              </div>
+            </div>
+          </div>
+
+          {/* Calendar Highlight */}
+          {calData && (
+            <div className="calendar-widget">
+              <h3 className="calendar-month">Tháng {calData.month.toString().padStart(2, '0')} / {calData.year}</h3>
+              <table className="calendar-table">
+                <thead>
+                  <tr>
+                    <th>CN</th>
+                    <th>T2</th>
+                    <th>T3</th>
+                    <th>T4</th>
+                    <th>T5</th>
+                    <th>T6</th>
+                    <th>T7</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calData.weeks.map((week, wi) => (
+                    <tr key={wi}>
+                      {week.map((day, di) => {
+                        const isWeddingDay = day === calData.targetDay;
+                        return (
+                          <td key={di} className={isWeddingDay ? "wedding-highlight" : ""}>
+                            {day || ''}
+                            {isWeddingDay && <div className="heart-indicator">❤</div>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="calendar-actions">
+                {card.map_url && (
+                  <a href={card.map_url} target="_blank" rel="noopener noreferrer" className="btn-add-calendar">
+                    <i className="far fa-map"></i> Xem Google Maps
+                  </a>
+                )}
+                <a href="#rsvp-section" className="btn-rsvp-scroll">
+                  <i className="far fa-check-circle"></i> Xác nhận RSVP
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Venue details */}
+          <div className="venue-details">
+            <h3>ĐỊA ĐIỂM TỔ CHỨC TIỆC CƯỚI</h3>
+            <p className="venue-name">{card.venue_name}</p>
+            <p className="venue-address"><i className="fas fa-map-marker-alt"></i> {card.venue_address}</p>
+
+            {/* Google Map Iframe */}
+            {card.map_url && (
+              <div className="map-container">
+                <iframe
+                  src={mapIframeSrc}
+                  allowFullScreen
+                  loading="lazy"
+                  title="Bản đồ"
+                  style={{ border: 0, width: '100%', height: '100%' }}
+                >
+                </iframe>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Dress Code Section */}
+        {card.plan_id !== 'basic' && card.dress_code && (
+          <section className="dress-code">
+            <h2 className="section-gold-title">DRESS CODE</h2>
+            <p className="section-subtitle">Trang phục gợi ý dự tiệc</p>
+            <div className="dress-colors">
+              {card.dress_code.split(',').map((colorText, i) => {
+                const cleanText = colorText.trim();
+                let bgStyle = '#f43f5e';
+                if (cleanText.toLowerCase().includes('kem') || cleanText.toLowerCase().includes('be')) bgStyle = '#E8F0E4';
+                else if (cleanText.toLowerCase().includes('lục') || cleanText.toLowerCase().includes('rêu')) bgStyle = '#1F3A25';
+                else if (cleanText.toLowerCase().includes('trắng')) bgStyle = '#FFFFFF';
+                else if (cleanText.toLowerCase().includes('vàng')) bgStyle = '#F0D497';
+                else if (cleanText.toLowerCase().includes('đỏ')) bgStyle = '#A31D16';
+                else if (cleanText.toLowerCase().includes('xanh')) bgStyle = '#1e3a8a';
+
+                return (
+                  <div key={i} className="color-item">
+                    <div className="color-circle" style={{ backgroundColor: bgStyle, border: bgStyle === '#E8F0E4' ? '1px solid rgba(212, 175, 55, 0.4)' : 'none' }}></div>
+                    <span>{cleanText}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="dress-code-note">Để có những bức ảnh lưu niệm đồng điệu cùng cô dâu và chú rể</p>
+          </section>
+        )}
+
+        {/* Wedding Timeline Section */}
+        {/* Skipping timeline dynamic data since it's hardcoded in template but can be added if exist. Will keep the original HTML layout as is for design fidelity */}
+        <section className="timeline-section">
+          <h2 className="section-gold-title">LỊCH TRÌNH TIỆC CƯỚI</h2>
+          <div className="timeline-container">
+            <div className="timeline-line"></div>
+
+            <div className="timeline-item">
+              <div className="timeline-time">17:30</div>
+              <div className="timeline-badge"></div>
+              <div className="timeline-content">
+                <h4>ĐÓN KHÁCH</h4>
+                <p>Đón tiếp khách mời &amp; Chụp ảnh lưu niệm tại Backdrop tiệc cưới</p>
+              </div>
+            </div>
+
+            <div className="timeline-item">
+              <div className="timeline-time">18:30</div>
+              <div className="timeline-badge"></div>
+              <div className="timeline-content">
+                <h4>KHAI TIỆC</h4>
+                <p>Mở màn nghi thức cưới &amp; MC tuyên bố lý do buổi tiệc</p>
+              </div>
+            </div>
+
+            <div className="timeline-item">
+              <div className="timeline-time">18:45</div>
+              <div className="timeline-badge"></div>
+              <div className="timeline-content">
+                <h4>LÀM LỄ THÀNH HÔN</h4>
+                <p>Cắt bánh cưới, rót rượu giao bôi &amp; Đại diện gia đình phát biểu cảm ơn</p>
+              </div>
+            </div>
+
+            <div className="timeline-item">
+              <div className="timeline-time">19:00</div>
+              <div className="timeline-badge"></div>
+              <div className="timeline-content">
+                <h4>PHỤC VỤ MÓN CHÍNH</h4>
+                <p>Thưởng thức tiệc ẩm thực &amp; Giao lưu văn nghệ cùng ban nhạc cưới</p>
+              </div>
+            </div>
+
+            <div className="timeline-item">
+              <div className="timeline-time">21:00</div>
+              <div className="timeline-badge"></div>
+              <div className="timeline-content">
+                <h4>KẾT THÚC TIỆC</h4>
+                <p>Tiễn khách &amp; Trao quà cảm ơn từ cô dâu &amp; chú rể</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* RSVP Section */}
+        <section className="rsvp" id="rsvp-section">
+          <h2 className="section-gold-title">XÁC NHẬN THAM DỰ</h2>
+          <p className="section-subtitle">Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng tôi</p>
+
+          <form className="rsvp-form" id="rsvp-form" onSubmit={handleRsvpSubmit}>
+            <div className="form-group">
+              <label htmlFor="guest-name">Họ tên khách mời *</label>
+              <input type="text" id="guest-name" placeholder="Nhập tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="guest-status">Bạn sẽ tham gia chứ? *</label>
+              <select id="guest-status" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
+                <option value="yes">Chắc chắn tham dự</option>
+                <option value="no">Rất tiếc không thể đến</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="guest-count">Số người tham dự đi cùng</label>
+              <select id="guest-count" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
+                <option value={0}>Chỉ một mình tôi</option>
+                <option value={1}>1 người đi cùng</option>
+                <option value={2}>2 người đi cùng</option>
+                <option value={3}>3 người đi cùng</option>
+              </select>
+            </div>
+            <button type="submit" className="btn-submit" disabled={rsvpSubmitting}>
+              <span>{rsvpSubmitting ? 'Đang Gửi...' : 'Gửi Xác Nhận'}</span>
+              <div className="btn-shine"></div>
+            </button>
+          </form>
+        </section>
+
+        {/* Guestbook Section */}
+        {card.plan_id !== 'basic' && (
+          <section className="guestbook">
+            <h2 className="section-gold-title">GỬI LỜI CHÚC MỪNG</h2>
+            <p className="section-subtitle">Để lại lời chúc ngọt ngào gửi tới cặp đôi mới cưới</p>
+
+            <form className="wish-form" id="wish-form" onSubmit={handleWishSubmit}>
+              <div className="form-group">
+                <input type="text" id="wish-name" placeholder="Nhập tên của bạn *" required value={wishName} onChange={(e) => setWishName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <textarea id="wish-text" rows={3} placeholder="Nhập lời chúc của bạn gửi cô dâu &amp; chú rể... *" required value={wishText} onChange={(e) => setWishText(e.target.value)}></textarea>
+              </div>
+              <button type="submit" className="btn-submit-wish" disabled={wishSubmitting}>
+                {wishSubmitting ? 'Đang Gửi...' : 'Gửi Lời Chúc'}
+              </button>
+            </form>
+
+            <div className="guestbook-list" id="wishes-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              {loadingWishes ? (
+                <p style={{ textAlign: 'center', opacity: 0.7 }}>Đang tải lời chúc...</p>
+              ) : wishes.length > 0 ? (
+                wishes.map((wish) => (
+                  <div key={wish.id} className="wish-item">
+                    <strong>{wish.guest_name}</strong>
+                    <p>{wish.message}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', opacity: 0.7 }}>Chưa có lời chúc nào.</p>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Gift Registry Section */}
+        {(card.groom_bank_account || card.bride_bank_account) && (
+          <section className="gifts">
+            <h2 className="section-gold-title">PHONG BAO MỪNG CƯỚI</h2>
+            <p className="section-subtitle">Mọi lời chúc mừng và quà tặng đều được trân trọng ghi nhận</p>
+
+            <div className="gift-registry-trigger-container">
+              <button className="gift-envelope-btn" id="gift-modal-trigger" onClick={() => setGiftModalOpen(true)}>
+                <div className="envelope-character">囍</div>
+                <span>Nhấn để mở phong bao mừng cưới</span>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Footer */}
+        <footer className="wedding-footer">
+          <p className="footer-thank">{card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!'}</p>
+          <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link">♡ Loobycard.com</a>
+        </footer>
+
+        {/* Bottom decor image */}
+        <img src="/assets/images/template-12/hoa.svg" className="bg-decor-bottom" alt="" />
+      </div>
+
+      {/* Gift Registry Modal Overlay */}
+      {giftModalOpen && (
+        <div className="gift-modal-overlay" id="gift-modal" style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+          <div className="gift-modal-card">
+            <button className="gift-modal-close" id="gift-modal-close" onClick={() => setGiftModalOpen(false)}>×</button>
+            <h3 className="modal-title">Thông Tin Mừng Cưới</h3>
+            <div className="bank-accounts-grid">
+              {card.groom_bank_account && (
+                <div className="bank-card">
+                  <div className="bank-card-header">{card.groom_role || 'Chú Rể'}</div>
+                  <h4 className="account-name">{card.groom_bank_holder}</h4>
+                  <p className="bank-info">{card.groom_bank_name}</p>
+                  <p className="account-number">Số TK: <strong>{card.groom_bank_account}</strong></p>
+                  <div className="qr-code">
+                    {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
+                      <img src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {card.bride_bank_account && (
+                <div className="bank-card">
+                  <div className="bank-card-header">{card.bride_role || 'Cô Dâu'}</div>
+                  <h4 className="account-name">{card.bride_bank_holder}</h4>
+                  <p className="bank-info">{card.bride_bank_name}</p>
+                  <p className="account-number">Số TK: <strong>{card.bride_bank_account}</strong></p>
+                  <div className="qr-code">
+                    {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
+                      <img src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Lightbox Modal Overlay (For Album click) */}
+      {lightboxImg && (
+        <div className="lightbox-overlay" id="lightbox" style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+          <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '30px', background: 'transparent', border: 'none', cursor: 'pointer' }}>×</button>
+          <div className="lightbox-content" style={{ maxWidth: '90vw', maxHeight: '90vh' }}>
+            <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} />
+            {/* Simple nav hidden for now since we just display the clicked image */}
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}

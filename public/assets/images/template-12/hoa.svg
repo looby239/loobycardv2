@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37" />
+      <stop offset="30%" stop-color="#F3E5AB" />
+      <stop offset="70%" stop-color="#AA7C11" />
+      <stop offset="100%" stop-color="#D4AF37" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#gold-grad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Corner Border Lines -->
+    <path d="M 3,3 L 115,3" stroke-width="2.5" />
+    <path d="M 3,3 L 3,115" stroke-width="2.5" />
+    <path d="M 8,8 L 90,8" stroke-width="0.8" opacity="0.7" />
+    <path d="M 8,8 L 8,90" stroke-width="0.8" opacity="0.7" />
+
+    <!-- Ornate Scrollwork / Traditional Swirls -->
+    <path d="M 10,10 C 25,12 40,25 35,45 C 32,60 15,55 20,40 C 24,28 35,32 30,20" />
+    <path d="M 10,10 C 12,25 25,40 45,35 C 60,32 55,15 40,20 C 28,24 32,35 20,30" />
+    
+    <!-- Central decorative leaf-like curves -->
+    <path d="M 12,12 Q 30,30 55,55" stroke-width="1.8" />
+    <path d="M 30,30 Q 15,45 22,52" />
+    <path d="M 30,30 Q 45,15 52,22" />
+    <path d="M 42,42 Q 32,58 38,64" />
+    <path d="M 42,42 Q 58,32 64,38" />
+
+    <!-- Leaf shapes -->
+    <path d="M 55,55 C 62,52 68,58 65,65 C 58,68 52,62 55,55 Z" fill="url(#gold-grad)" fill-opacity="0.3" stroke-width="1" />
+    <path d="M 22,52 C 16,56 18,65 25,62 C 28,55 25,50 22,52 Z" fill="url(#gold-grad)" fill-opacity="0.2" stroke-width="0.8" />
+    <path d="M 52,22 C 56,16 65,18 62,25 C 55,28 50,25 52,22 Z" fill="url(#gold-grad)" fill-opacity="0.2" stroke-width="0.8" />
+
+    <!-- Accent dots -->
+    <circle cx="75" cy="15" r="2" fill="url(#gold-grad)" stroke="none" />
+    <circle cx="85" cy="15" r="1.5" fill="url(#gold-grad)" stroke="none" opacity="0.8" />
+    <circle cx="95" cy="15" r="1" fill="url(#gold-grad)" stroke="none" opacity="0.6" />
+    
+    <circle cx="15" cy="75" r="2" fill="url(#gold-grad)" stroke="none" />
+    <circle cx="15" cy="85" r="1.5" fill="url(#gold-grad)" stroke="none" opacity="0.8" />
+    <circle cx="15" cy="95" r="1" fill="url(#gold-grad)" stroke="none" opacity="0.6" />
+
+    <!-- Small details inside the corner -->
+    <path d="M 3,3 Q 12,12 15,3" stroke-width="1" />
+    <path d="M 3,3 Q 12,12 3,15" stroke-width="1" />
+    <circle cx="6" cy="6" r="1.5" fill="url(#gold-grad)" stroke="none" />
+  </g>
+</svg>

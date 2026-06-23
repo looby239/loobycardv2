@@ -207,13 +207,22 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
     
     let planName = 'Gói Cơ Bản';
     let durationText = '1 tháng';
+    let planPrice = 99000;
     if (demo.planId === 'premium') {
       planName = 'Gói Premium';
       durationText = '3 tháng';
+      planPrice = 399000;
     } else if (demo.planId === 'luxury') {
       planName = 'Gói Luxury';
       durationText = '6 tháng';
+      planPrice = 1199000;
     }
+
+    const bankId = 'TPB';
+    const accountNumber = '03878504601';
+    const accountName = 'NGUYEN THANH LOC';
+    const memo = `LOOBYCARD-${demo.slug}`;
+    const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.png?amount=${planPrice}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accountName)}`;
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
@@ -229,7 +238,18 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
           </p>
           <p><strong>Gói bạn đã chọn:</strong> ${planName}</p>
           <p><strong>Thời hạn hiển thị sau khi thanh toán:</strong> ${durationText}</p>
-          <p><strong>Nội dung chuyển khoản thanh toán:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">LOOBYCARD-${demo.slug}</span></p>
+          
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 15px 0;" />
+          <h3 style="color: #a31d16; font-size: 16px; margin-top: 0;">THÔNG TIN CHUYỂN KHOẢN THANH TOÁN</h3>
+          <div style="text-align: center; margin: 15px 0;">
+            <img src="${qrUrl}" alt="Mã QR Thanh Toán" style="width: 250px; height: 250px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: #ffffff;" />
+          </div>
+          <p><strong>Ngân hàng:</strong> Ngân hàng Tiên Phong (TPBank)</p>
+          <p><strong>Số tài khoản:</strong> 03878504601</p>
+          <p><strong>Chủ tài khoản:</strong> NGUYEN THANH LOC</p>
+          <p><strong>Số tiền:</strong> <span style="color: #ef4444; font-weight: bold;">${planPrice.toLocaleString('vi-VN')} VNĐ</span></p>
+          <p><strong>Nội dung chuyển khoản:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${memo}</span></p>
+          <p style="font-size: 13px; color: #4b5563; font-style: italic; margin-bottom: 0;">(Vui lòng chuyển khoản đúng nội dung để hệ thống ghi nhận và duyệt thiệp nhanh nhất)</p>
         </div>
 
         <p>Cảm ơn bạn đã sử dụng LoobyCard. Chúc ngày trọng đại của bạn diễn ra tốt đẹp nhất!</p>

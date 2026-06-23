@@ -1,14 +1,79 @@
-﻿/* === AUTO CENTER FIX === */
-body { text-align: center; }
+/* === AUTO CENTER FIX === */
+.t16-wrapper { text-align: center; }
+.template-container { margin-left: auto !important; margin-right: auto !important; width: 100% !important; }
+.t16-wrapper .rsvp-form, .t16-wrapper .wish-form, .t16-wrapper .form-group, .t16-wrapper .timeline-box, .t16-wrapper .guestbook-list, .t16-wrapper .wish-item { text-align: left; }
+/* === END AUTO CENTER FIX === */
+
+@keyframes leaf-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(105vh) translateX(var(--sway)) rotate(360deg) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes heart-pulse {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes shine {
+  0% { left: -100px; }
+  35% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes music-pulse {
+  0% { box-shadow: 0 4px 15px rgba(46, 125, 112, 0.3); }
+  100% { box-shadow: 0 4px 25px rgba(46, 125, 112, 0.6); }
+}
+
+@keyframes bounce-wave {
+  0% { transform: scaleY(0.25); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes wishFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gift-shake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-8deg); }
+  30% { transform: rotate(8deg); }
+  45% { transform: rotate(-4deg); }
+  60% { transform: rotate(4deg); }
+  75% { transform: rotate(0deg); }
+}
+
+@keyframes lbZoom {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.t16-wrapper {
+/* === AUTO CENTER FIX === */
+& { text-align: center; }
 .template-container { margin-left: auto !important; margin-right: auto !important; max-width: 500px; width: 100% !important; }
 .rsvp-form, .wish-form, .form-group, .timeline-box, .guestbook-list, .wish-item { text-align: left; }
 /* === END AUTO CENTER FIX === */
 
 /* -------------------------------------------------------------
-   Template-16 Style System: Thanh Diá»‡p Xanh (Elegant Teal Leaf)
+   Template-16 Style System: Thanh Diệp Xanh (Elegant Teal Leaf)
    ------------------------------------------------------------- */
 
-:root {
+& {
   --bg-light: #f2f6f4;
   --bg-card: #ffffff;
   --color-primary: #2e7d70;
@@ -35,11 +100,11 @@ body { text-align: center; }
   padding: 0;
 }
 
-html {
+& {
   scroll-behavior: smooth;
 }
 
-body {
+& {
   font-family: var(--font-sans);
   background-color: var(--bg-light);
   color: var(--color-text);
@@ -124,22 +189,7 @@ a {
   user-select: none;
 }
 
-@keyframes leaf-fall {
-  0% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(0.8);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  90% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(105vh) translateX(var(--sway)) rotate(360deg) scale(1.2);
-    opacity: 0;
-  }
-}
+
 
 .envelope-card {
   position: relative;
@@ -199,11 +249,7 @@ a {
   animation: heart-pulse 2s infinite;
 }
 
-@keyframes heart-pulse {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.08); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
+
 
 .couple-names-cover {
   font-family: var(--font-cursive);
@@ -277,11 +323,7 @@ a {
   pointer-events: none;
 }
 
-@keyframes shine {
-  0% { left: -100px; }
-  35% { left: 100%; }
-  100% { left: 100%; }
-}
+
 
 /* Music Control Floating Button */
 .music-toggle {
@@ -307,10 +349,7 @@ a {
   animation: music-pulse 2s ease-in-out infinite alternate;
 }
 
-@keyframes music-pulse {
-  0% { box-shadow: 0 4px 15px rgba(46, 125, 112, 0.3); }
-  100% { box-shadow: 0 4px 25px rgba(46, 125, 112, 0.6); }
-}
+
 
 .music-waves {
   display: flex;
@@ -337,10 +376,7 @@ a {
   animation-play-state: paused;
 }
 
-@keyframes bounce-wave {
-  0% { transform: scaleY(0.25); }
-  100% { transform: scaleY(1); }
-}
+
 
 /* Main Container and Sections */
 .template-container {
@@ -1175,10 +1211,7 @@ section {
   line-height: 1.45;
 }
 
-@keyframes wishFadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+
 
 /* Gift Envelope Red-Packet styles */
 .gift-registry-trigger-container {
@@ -1223,14 +1256,7 @@ section {
   animation: gift-shake 2.5s infinite;
 }
 
-@keyframes gift-shake {
-  0%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(-8deg); }
-  30% { transform: rotate(8deg); }
-  45% { transform: rotate(-4deg); }
-  60% { transform: rotate(4deg); }
-  75% { transform: rotate(0deg); }
-}
+
 
 .gift-envelope-btn span {
   font-size: 0.95rem;
@@ -1449,10 +1475,7 @@ section {
   animation: lbZoom 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 }
 
-@keyframes lbZoom {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+
 
 .lightbox-nav {
   position: absolute;
@@ -1551,3 +1574,4 @@ section {
   }
 }
 
+}

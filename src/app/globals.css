@@ -39,15 +39,4 @@ body {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Template Scoped Stylesheets */
-@import "../styles/templates/template-10.css";
-@import "../styles/templates/template-11.css";
-@import "../styles/templates/template-12.css";
-@import "../styles/templates/template-13.css";
-@import "../styles/templates/template-14.css";
-@import "../styles/templates/template-15.css";
-@import "../styles/templates/template-16.css";
-@import "../styles/templates/template-17.css";
-@import "../styles/templates/template-18.css";
-@import "../styles/templates/template-19.css";
 

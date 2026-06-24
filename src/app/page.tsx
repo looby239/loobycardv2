@@ -36,9 +36,6 @@ export default function HomePage() {
             <a href="#templates" className="hover:text-primary transition">Mẫu thiệp</a>
             <a href="#how-it-works" className="hover:text-primary transition">Hướng dẫn</a>
             <a href="#pricing" className="hover:text-primary transition">Bảng giá</a>
-            <Link href="/admin" className="hover:text-primary transition flex items-center gap-1 text-slate-400 text-xs">
-              <Laptop size={14} /> Admin
-            </Link>
           </nav>
 
           <button
@@ -56,7 +53,6 @@ export default function HomePage() {
             <a href="#templates" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary py-1 transition w-full text-center">Mẫu thiệp</a>
             <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary py-1 transition w-full text-center">Hướng dẫn</a>
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary py-1 transition w-full text-center">Bảng giá</a>
-            <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary py-1 transition w-full text-center text-slate-500">Admin</Link>
             <Link href="/templates" onClick={() => setMobileMenuOpen(false)} className="bg-primary hover:bg-primary-hover text-white font-semibold py-2 px-6 rounded-lg shadow transition w-4/5 text-center">
               Tạo thiệp ngay
             </Link>

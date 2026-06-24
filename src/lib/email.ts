@@ -1,7 +1,10 @@
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY || '');
-const emailFrom = process.env.EMAIL_FROM || '"LoobyCard" <hotro@loobycard.com>';
+let emailFrom = process.env.EMAIL_FROM || '"LoobyCard" <hotro@loobycard.com>';
+if (emailFrom.includes('@gmail.com')) {
+  emailFrom = '"LoobyCard" <hotro@loobycard.com>';
+}
 
 interface CardInfo {
   customerName: string;

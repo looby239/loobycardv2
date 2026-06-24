@@ -1216,7 +1216,7 @@ function CreateWizard() {
                     ) : (
                       <>
                         <QrCode size={16} />
-                        <span>Xác nhận &amp; Thanh toán</span>
+                        <span>Xác nhận &amp; Xem demo</span>
                       </>
                     )}
                   </button>

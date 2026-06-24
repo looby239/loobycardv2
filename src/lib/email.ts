@@ -35,7 +35,8 @@ export async function sendPublishEmail(card: CardInfo) {
     const transparentQrRes = await fetch(card.transparentQrUrl);
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
+    if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
     const cardLink = `${siteUrl}/${card.slug}`;
     const manageLink = `${siteUrl}/manage/${card.manageToken}`;
 
@@ -127,7 +128,8 @@ export async function sendDomainActivationEmail(card: CardInfo) {
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
     const customDomainLink = \`https://\${card.customDomain}\`;
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
+    if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
     const fallbackLink = \`\${siteUrl}/\${card.slug}\`;
 
     const htmlContent = \`
@@ -197,7 +199,8 @@ export async function sendDomainActivationEmail(card: CardInfo) {
  */
 export async function sendDemoEmail(demo: DemoEmailInfo) {
   try {
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
+    if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
     const previewLink = \`\${siteUrl}/preview/\${demo.slug}\`;
     
     let planName = 'Gói Cơ Bản';

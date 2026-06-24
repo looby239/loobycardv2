@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     }
 
     // 2. Determine card site URL
-    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
+    if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
     const cardUrl = `${siteUrl}/${card.slug}`;
 
     // 3. Generate QR Codes (standard & transparent) and upload to Storage

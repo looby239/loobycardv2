@@ -1,20 +1,7 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const emailHost = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const emailPort = parseInt(process.env.EMAIL_PORT || '587', 10);
-const emailUser = process.env.EMAIL_USERNAME || process.env.GMAIL_USER || '';
-const emailPassword = process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD || '';
-const emailFrom = process.env.EMAIL_FROM || '"LoobyCard" <noreply@loobycard.com>';
-
-const transporter = nodemailer.createTransport({
-  host: emailHost,
-  port: emailPort,
-  secure: emailPort === 465, // true for 465, false for other ports
-  auth: {
-    user: emailUser,
-    pass: emailPassword,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY || '');
+const emailFrom = process.env.EMAIL_FROM || '"LoobyCard" <hotro@loobycard.com>';
 
 interface CardInfo {
   customerName: string;
@@ -52,7 +39,7 @@ export async function sendPublishEmail(card: CardInfo) {
     const cardLink = `${siteUrl}/${card.slug}`;
     const manageLink = `${siteUrl}/manage/${card.manageToken}`;
 
-    const rsvpText = card.planId !== 'basic' || true // User says: "Nếu gói có RSVP: Hiển thị thêm: Link quản lý RSVP" - Basic has RSVP up to 100, Premium/Luxury have unlimited. All plans have RSVP!
+    const rsvpText = card.planId !== 'basic' || true
       ? `<p><strong>Link quản lý RSVP (Không cần đăng nhập):</strong><br>
          <a href="${manageLink}" style="color: #2563eb; font-weight: bold; text-decoration: underline;">${manageLink}</a></p>
          <p>Tại trang quản lý RSVP, bạn có thể xem danh sách phản hồi tham dự, xem lời chúc mừng và xuất dữ liệu ra file CSV.</p>`
@@ -93,33 +80,35 @@ export async function sendPublishEmail(card: CardInfo) {
       </div>
     `;
 
-    const mailOptions = {
+    const { data, error } = await resend.emails.send({
       from: emailFrom,
-      to: card.customerEmail,
+      to: [card.customerEmail],
       subject: 'Thiệp của bạn đã được xuất bản',
       html: htmlContent,
       attachments: [
         {
           filename: 'qr_code.png',
           content: standardBuffer,
-          contentType: 'image/png',
         },
         {
           filename: 'qr_code_transparent.png',
           content: transparentBuffer,
-          contentType: 'image/png',
         },
         {
           filename: 'qr_code.png',
           content: standardBuffer,
-          cid: 'standard_qr', // embedded image reference
+          contentId: 'standard_qr',
         },
       ],
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Publish email sent: %s', info.messageId);
-    return info;
+    if (error) {
+      console.error('Error sending publish email via Resend:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('Publish email sent via Resend:', data?.id);
+    return data;
   } catch (error) {
     console.error('Error sending publish email:', error);
     throw error;
@@ -137,22 +126,22 @@ export async function sendDomainActivationEmail(card: CardInfo) {
     const transparentQrRes = await fetch(card.transparentQrUrl);
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
-    const customDomainLink = `https://${card.customDomain}`;
+    const customDomainLink = \`https://\${card.customDomain}\`;
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
-    const fallbackLink = `${siteUrl}/${card.slug}`;
+    const fallbackLink = \`\${siteUrl}/\${card.slug}\`;
 
-    const htmlContent = `
+    const htmlContent = \`
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
         <h2 style="color: #a31d16; text-align: center; border-bottom: 2px solid #f0d497; padding-bottom: 10px;">TÊN MIỀN RIÊNG ĐÃ ĐƯỢC KÍCH HOẠT</h2>
-        <p>Xin chào <strong>${card.customerName}</strong>,</p>
+        <p>Xin chào <strong>\${card.customerName}</strong>,</p>
         <p>Tên miền riêng cho gói Luxury của bạn đã được kích hoạt thành công.</p>
         
         <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <p style="margin-top: 0;"><strong>Thông tin đường dẫn:</strong></p>
           <p><strong>Đường dẫn tên miền riêng:</strong><br>
-             <a href="${customDomainLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">${customDomainLink}</a></p>
+             <a href="\${customDomainLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">\${customDomainLink}</a></p>
           <p><strong>Đường dẫn dự phòng (LoobyCard):</strong><br>
-             <a href="${fallbackLink}" style="color: #6b7280; text-decoration: underline;">${fallbackLink}</a></p>
+             <a href="\${fallbackLink}" style="color: #6b7280; text-decoration: underline;">\${fallbackLink}</a></p>
         </div>
 
         <div style="text-align: center; margin: 30px 0;">
@@ -166,35 +155,37 @@ export async function sendDomainActivationEmail(card: CardInfo) {
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
-    `;
+    \`;
 
-    const mailOptions = {
+    const { data, error } = await resend.emails.send({
       from: emailFrom,
-      to: card.customerEmail,
+      to: [card.customerEmail],
       subject: 'Tên miền riêng của bạn đã được kích hoạt',
       html: htmlContent,
       attachments: [
         {
           filename: 'qr_code_domain.png',
           content: standardBuffer,
-          contentType: 'image/png',
         },
         {
           filename: 'qr_code_domain_transparent.png',
           content: transparentBuffer,
-          contentType: 'image/png',
         },
         {
           filename: 'qr_code_domain.png',
           content: standardBuffer,
-          cid: 'standard_qr',
+          contentId: 'standard_qr',
         },
       ],
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Domain activation email sent: %s', info.messageId);
-    return info;
+    if (error) {
+      console.error('Error sending domain activation email via Resend:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('Domain activation email sent via Resend:', data?.id);
+    return data;
   } catch (error) {
     console.error('Error sending domain activation email:', error);
     throw error;
@@ -207,7 +198,7 @@ export async function sendDomainActivationEmail(card: CardInfo) {
 export async function sendDemoEmail(demo: DemoEmailInfo) {
   try {
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
-    const previewLink = `${siteUrl}/preview/${demo.slug}`;
+    const previewLink = \`\${siteUrl}/preview/\${demo.slug}\`;
     
     let planName = 'Gói Cơ Bản';
     let durationText = '1 tháng';
@@ -225,34 +216,34 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
     const bankId = 'TPB';
     const accountNumber = '03878504601';
     const accountName = 'NGUYEN THANH LOC';
-    const memo = `LOOBYCARD-${demo.slug}`;
-    const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.png?amount=${planPrice}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accountName)}`;
+    const memo = \`LOOBYCARD-\${demo.slug}\`;
+    const qrUrl = \`https://img.vietqr.io/image/\${bankId}-\${accountNumber}-compact2.png?amount=\${planPrice}&addInfo=\${encodeURIComponent(memo)}&accountName=\${encodeURIComponent(accountName)}\`;
 
-    const htmlContent = `
+    const htmlContent = \`
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
         <h2 style="color: #a31d16; text-align: center; border-bottom: 2px solid #f0d497; padding-bottom: 10px;">DEMO THIỆP CỦA BẠN ĐÃ ĐƯỢC TẠO</h2>
-        <p>Xin chào <strong>${demo.customerName}</strong>,</p>
+        <p>Xin chào <strong>\${demo.customerName}</strong>,</p>
         <p>Demo thiệp của bạn đã được tạo thành công trên LoobyCard.</p>
         
         <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <p><strong>Link xem demo:</strong><br>
-             <a href="${previewLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">${previewLink}</a></p>
+             <a href="\${previewLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">\${previewLink}</a></p>
           <p style="color: #ef4444; font-size: 13px; font-weight: bold; margin: 15px 0;">
             Lưu ý: Link demo chỉ được lưu trong 24 giờ. Nếu bạn chưa thanh toán trong thời gian này, hệ thống sẽ tự động xóa demo và toàn bộ dữ liệu đã tải lên.
           </p>
-          <p><strong>Gói bạn đã chọn:</strong> ${planName}</p>
-          <p><strong>Thời hạn hiển thị sau khi thanh toán:</strong> ${durationText}</p>
+          <p><strong>Gói bạn đã chọn:</strong> \${planName}</p>
+          <p><strong>Thời hạn hiển thị sau khi thanh toán:</strong> \${durationText}</p>
           
           <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 15px 0;" />
           <h3 style="color: #a31d16; font-size: 16px; margin-top: 0;">THÔNG TIN CHUYỂN KHOẢN THANH TOÁN</h3>
           <div style="text-align: center; margin: 15px 0;">
-            <img src="${qrUrl}" alt="Mã QR Thanh Toán" style="width: 250px; height: 250px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: #ffffff;" />
+            <img src="\${qrUrl}" alt="Mã QR Thanh Toán" style="width: 250px; height: 250px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: #ffffff;" />
           </div>
           <p><strong>Ngân hàng:</strong> Ngân hàng Tiên Phong (TPBank)</p>
           <p><strong>Số tài khoản:</strong> 03878504601</p>
           <p><strong>Chủ tài khoản:</strong> NGUYEN THANH LOC</p>
-          <p><strong>Số tiền:</strong> <span style="color: #ef4444; font-weight: bold;">${planPrice.toLocaleString('vi-VN')} VNĐ</span></p>
-          <p><strong>Nội dung chuyển khoản:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${memo}</span></p>
+          <p><strong>Số tiền:</strong> <span style="color: #ef4444; font-weight: bold;">\${planPrice.toLocaleString('vi-VN')} VNĐ</span></p>
+          <p><strong>Nội dung chuyển khoản:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">\${memo}</span></p>
           <p style="font-size: 13px; color: #4b5563; font-style: italic; margin-bottom: 0;">(Vui lòng chuyển khoản đúng nội dung để hệ thống ghi nhận và duyệt thiệp nhanh nhất)</p>
         </div>
 
@@ -261,18 +252,22 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
-    `;
+    \`;
 
-    const mailOptions = {
+    const { data, error } = await resend.emails.send({
       from: emailFrom,
-      to: demo.customerEmail,
+      to: [demo.customerEmail],
       subject: 'Demo thiệp của bạn đã được tạo',
       html: htmlContent,
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Demo email sent: %s', info.messageId);
-    return info;
+    if (error) {
+      console.error('Error sending demo email via Resend:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('Demo email sent via Resend:', data?.id);
+    return data;
   } catch (error) {
     console.error('Error sending demo email:', error);
     throw error;

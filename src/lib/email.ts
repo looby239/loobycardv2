@@ -127,23 +127,23 @@ export async function sendDomainActivationEmail(card: CardInfo) {
     const transparentQrRes = await fetch(card.transparentQrUrl);
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
-    const customDomainLink = \`https://\${card.customDomain}\`;
+    const customDomainLink = `https://${card.customDomain}`;
     let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
     if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
-    const fallbackLink = \`\${siteUrl}/\${card.slug}\`;
+    const fallbackLink = `${siteUrl}/${card.slug}`;
 
-    const htmlContent = \`
+    const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
         <h2 style="color: #a31d16; text-align: center; border-bottom: 2px solid #f0d497; padding-bottom: 10px;">TÊN MIỀN RIÊNG ĐÃ ĐƯỢC KÍCH HOẠT</h2>
-        <p>Xin chào <strong>\${card.customerName}</strong>,</p>
+        <p>Xin chào <strong>${card.customerName}</strong>,</p>
         <p>Tên miền riêng cho gói Luxury của bạn đã được kích hoạt thành công.</p>
         
         <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <p style="margin-top: 0;"><strong>Thông tin đường dẫn:</strong></p>
           <p><strong>Đường dẫn tên miền riêng:</strong><br>
-             <a href="\${customDomainLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">\${customDomainLink}</a></p>
+             <a href="${customDomainLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">${customDomainLink}</a></p>
           <p><strong>Đường dẫn dự phòng (LoobyCard):</strong><br>
-             <a href="\${fallbackLink}" style="color: #6b7280; text-decoration: underline;">\${fallbackLink}</a></p>
+             <a href="${fallbackLink}" style="color: #6b7280; text-decoration: underline;">${fallbackLink}</a></p>
         </div>
 
         <div style="text-align: center; margin: 30px 0;">
@@ -157,7 +157,7 @@ export async function sendDomainActivationEmail(card: CardInfo) {
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
-    \`;
+    `;
 
     const { data, error } = await resend.emails.send({
       from: emailFrom,
@@ -201,7 +201,7 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
   try {
     let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
     if (siteUrl.includes('loobycard.com')) siteUrl = 'https://loobycard.com';
-    const previewLink = \`\${siteUrl}/preview/\${demo.slug}\`;
+    const previewLink = `${siteUrl}/preview/${demo.slug}`;
     
     let planName = 'Gói Cơ Bản';
     let durationText = '1 tháng';
@@ -219,34 +219,34 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
     const bankId = 'TPB';
     const accountNumber = '03878504601';
     const accountName = 'NGUYEN THANH LOC';
-    const memo = \`LOOBYCARD-\${demo.slug}\`;
-    const qrUrl = \`https://img.vietqr.io/image/\${bankId}-\${accountNumber}-compact2.png?amount=\${planPrice}&addInfo=\${encodeURIComponent(memo)}&accountName=\${encodeURIComponent(accountName)}\`;
+    const memo = `LOOBYCARD-${demo.slug}`;
+    const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.png?amount=${planPrice}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accountName)}`;
 
-    const htmlContent = \`
+    const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
         <h2 style="color: #a31d16; text-align: center; border-bottom: 2px solid #f0d497; padding-bottom: 10px;">DEMO THIỆP CỦA BẠN ĐÃ ĐƯỢC TẠO</h2>
-        <p>Xin chào <strong>\${demo.customerName}</strong>,</p>
+        <p>Xin chào <strong>${demo.customerName}</strong>,</p>
         <p>Demo thiệp của bạn đã được tạo thành công trên LoobyCard.</p>
         
         <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <p><strong>Link xem demo:</strong><br>
-             <a href="\${previewLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">\${previewLink}</a></p>
+             <a href="${previewLink}" style="color: #a31d16; font-weight: bold; text-decoration: underline;">${previewLink}</a></p>
           <p style="color: #ef4444; font-size: 13px; font-weight: bold; margin: 15px 0;">
             Lưu ý: Link demo chỉ được lưu trong 24 giờ. Nếu bạn chưa thanh toán trong thời gian này, hệ thống sẽ tự động xóa demo và toàn bộ dữ liệu đã tải lên.
           </p>
-          <p><strong>Gói bạn đã chọn:</strong> \${planName}</p>
-          <p><strong>Thời hạn hiển thị sau khi thanh toán:</strong> \${durationText}</p>
+          <p><strong>Gói bạn đã chọn:</strong> ${planName}</p>
+          <p><strong>Thời hạn hiển thị sau khi thanh toán:</strong> ${durationText}</p>
           
           <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 15px 0;" />
           <h3 style="color: #a31d16; font-size: 16px; margin-top: 0;">THÔNG TIN CHUYỂN KHOẢN THANH TOÁN</h3>
           <div style="text-align: center; margin: 15px 0;">
-            <img src="\${qrUrl}" alt="Mã QR Thanh Toán" style="width: 250px; height: 250px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: #ffffff;" />
+            <img src="${qrUrl}" alt="Mã QR Thanh Toán" style="width: 250px; height: 250px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: #ffffff;" />
           </div>
           <p><strong>Ngân hàng:</strong> Ngân hàng Tiên Phong (TPBank)</p>
           <p><strong>Số tài khoản:</strong> 03878504601</p>
           <p><strong>Chủ tài khoản:</strong> NGUYEN THANH LOC</p>
-          <p><strong>Số tiền:</strong> <span style="color: #ef4444; font-weight: bold;">\${planPrice.toLocaleString('vi-VN')} VNĐ</span></p>
-          <p><strong>Nội dung chuyển khoản:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">\${memo}</span></p>
+          <p><strong>Số tiền:</strong> <span style="color: #ef4444; font-weight: bold;">${planPrice.toLocaleString('vi-VN')} VNĐ</span></p>
+          <p><strong>Nội dung chuyển khoản:</strong> <span style="font-family: monospace; font-size: 14px; font-weight: bold; background-color: #f3f4f6; padding: 2px 6px; border-radius: 4px;">${memo}</span></p>
           <p style="font-size: 13px; color: #4b5563; font-style: italic; margin-bottom: 0;">(Vui lòng chuyển khoản đúng nội dung để hệ thống ghi nhận và duyệt thiệp nhanh nhất)</p>
         </div>
 
@@ -255,7 +255,7 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
-    \`;
+    `;
 
     const { data, error } = await resend.emails.send({
       from: emailFrom,

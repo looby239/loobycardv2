@@ -48,8 +48,9 @@ export async function sendPublishEmail(card: CardInfo) {
     const transparentQrRes = await fetch(card.transparentQrUrl);
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
-    const cardLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com'}/${card.slug}`;
-    const manageLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com'}/manage/${card.manageToken}`;
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    const cardLink = `${siteUrl}/${card.slug}`;
+    const manageLink = `${siteUrl}/manage/${card.manageToken}`;
 
     const rsvpText = card.planId !== 'basic' || true // User says: "Nếu gói có RSVP: Hiển thị thêm: Link quản lý RSVP" - Basic has RSVP up to 100, Premium/Luxury have unlimited. All plans have RSVP!
       ? `<p><strong>Link quản lý RSVP (Không cần đăng nhập):</strong><br>
@@ -137,7 +138,8 @@ export async function sendDomainActivationEmail(card: CardInfo) {
     const transparentBuffer = Buffer.from(await transparentQrRes.arrayBuffer());
 
     const customDomainLink = `https://${card.customDomain}`;
-    const fallbackLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com'}/${card.slug}`;
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
+    const fallbackLink = `${siteUrl}/${card.slug}`;
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px;">
@@ -204,7 +206,7 @@ export async function sendDomainActivationEmail(card: CardInfo) {
  */
 export async function sendDemoEmail(demo: DemoEmailInfo) {
   try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com';
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://loobycard.com').replace('http://loobycard.com', 'https://loobycard.com');
     const previewLink = `${siteUrl}/preview/${demo.slug}`;
     
     let planName = 'Gói Cơ Bản';

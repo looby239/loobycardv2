@@ -40,5 +40,5 @@ const mockCardData = {
 
 export default function LocThuStaticPreview() {
   // Pass previewMode=false to simulate the real viewer experience
-  return <Template10 card={mockCardData} previewMode={false} />;
+  return <Template10 card={mockCardData as any} previewMode={false} />;
 }

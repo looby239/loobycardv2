@@ -43,5 +43,5 @@ const mockCardData = {
 
 export default function Template11StaticPreview() {
   // Pass previewMode=false to simulate the real viewer experience
-  return <Template11 card={mockCardData} previewMode={false} />;
+  return <Template11 card={mockCardData as any} previewMode={false} />;
 }

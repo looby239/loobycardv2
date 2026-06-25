@@ -306,7 +306,7 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
         {/* Hero Section */}
         <section className="hero">
           <div className="hero-frame">
-            <img src={coverImage} alt="Ảnh cưới" className="hero-image" />
+            <img src={coverImage} alt="Ảnh cưới" className="hero-image" onClick={() => setLightboxImg(coverImage)} style={{ cursor: 'zoom-in' }} />
           </div>
           <h1 className="couple-names">{card.groom_name} &amp; {card.bride_name}</h1>
           <div className="date-badge">{shortDate}</div>
@@ -405,7 +405,7 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
             <p className="section-subtitle">Tình yêu ngọt ngào qua những khung hình</p>
             <div className="gallery-grid">
               {albumImages.map((imgUrl, i) => (
-                <img key={i} src={imgUrl} alt={`Gallery ${i + 1}`} className="gallery-img" onClick={() => setLightboxImg(imgUrl)} />
+                <img key={i} src={imgUrl} alt={`Gallery ${i + 1}`} className="gallery-img" onClick={() => setLightboxImg(imgUrl)} style={{ cursor: 'zoom-in' }} />
               ))}
             </div>
           </section>
@@ -486,7 +486,12 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
                   <p className="text-[12px] uppercase">{card.groom_bank_holder}</p>
                   <div className="qr-code">
                     {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) ? (
-                      <img src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} alt="QR" style={{ width: '150px', height: '150px', objectFit: 'contain' }} />
+                      <img 
+                        src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} 
+                        alt="QR" 
+                        style={{ width: '150px', height: '150px', objectFit: 'contain', cursor: 'zoom-in' }} 
+                        onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
+                      />
                     ) : (
                       <>
                         <i className="fas fa-qrcode"></i>
@@ -504,7 +509,12 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
                   <p className="text-[12px] uppercase">{card.bride_bank_holder}</p>
                   <div className="qr-code">
                     {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) ? (
-                      <img src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} alt="QR" style={{ width: '150px', height: '150px', objectFit: 'contain' }} />
+                      <img 
+                        src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} 
+                        alt="QR" 
+                        style={{ width: '150px', height: '150px', objectFit: 'contain', cursor: 'zoom-in' }} 
+                        onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
+                      />
                     ) : (
                       <>
                         <i className="fas fa-qrcode"></i>
@@ -524,8 +534,8 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
       {lightboxImg && (
-        <div className="lightbox-overlay" id="lightbox" style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
-          <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '30px', background: 'transparent', border: 'none', cursor: 'pointer' }}>×</button>
+        <div className="lightbox-overlay" id="lightbox" onClick={() => setLightboxImg(null)} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 99999, justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}>
+          <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '40px', background: 'transparent', border: 'none', cursor: 'pointer', zIndex: 100000 }}>&times;</button>
           <div className="lightbox-content" style={{ maxWidth: '90vw', maxHeight: '90vh' }}>
             <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} />
           </div>

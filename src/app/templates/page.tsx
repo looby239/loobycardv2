@@ -16,7 +16,7 @@ interface Template {
 }
 
 const TEMPLATES: Template[] = [
-  { id: 'template-10', name: 'Lời Hứa Vĩnh Cửu', type: 'thiep-cuoi', typeName: 'Thiệp cưới', thumbnail: '/assets/images/template-promise.png', previewUrl: '/templates/template-10/index.html' },
+  { id: 'template-10', name: 'Lời Hứa Vĩnh Cửu (Lộc & Thư)', type: 'thiep-cuoi', typeName: 'Thiệp cưới', thumbnail: '/assets/images/template-promise.png', previewUrl: '/loc-thu' },
   { id: 'template-11', name: 'Mai Lan Trắng', type: 'thiep-cuoi', typeName: 'Thiệp cưới', thumbnail: '/assets/images/template-11/preview.png', previewUrl: '/templates/template-11/index.html' },
   { id: 'template-12', name: 'Song Hỷ Xanh', type: 'thiep-cuoi', typeName: 'Thiệp cưới', thumbnail: '/assets/images/template-12/preview.png', previewUrl: '/templates/template-12/index.html' },
   { id: 'template-13', name: 'Vườn Xuân Xanh', type: 'thiep-cuoi', typeName: 'Thiệp cưới', thumbnail: '/assets/images/template-13/preview.png', previewUrl: '/templates/template-13/index.html' },

@@ -268,7 +268,7 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
           <div className="particle" style={{ left: '20%', animationDelay: '5s' }}>🌸</div>
         </div>
         
-        <div className="envelope-card">
+        <div className="envelope-card" onMouseEnter={handleOpenEnvelope}>
           <div className="envelope-seal">
             <i className="fas fa-heart"></i>
           </div>

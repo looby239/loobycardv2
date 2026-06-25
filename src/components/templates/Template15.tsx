@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getMapIframeSrc } from '@/lib/mapUtils';
 import { Heart, Volume2, VolumeX, MailOpen, Calendar, Clock, MapPin, Check, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
@@ -436,7 +437,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             {card.map_url && (
               <div className="map-container mt-6 overflow-hidden rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto h-64">
                 <iframe
-                  src={card.map_url.includes('google.com/maps') ? card.map_url : `https://maps.google.com/maps?q=${encodeURIComponent(card.venue_address)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                  src={getMapIframeSrc(card)}
                   allowFullScreen
                   loading="lazy"
                   className="w-full h-full border-none"

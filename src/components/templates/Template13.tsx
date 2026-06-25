@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getMapIframeSrc } from '@/lib/mapUtils';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-13.css';
@@ -275,9 +276,7 @@ export default function Template13({ card, previewMode = false }: TemplateProps)
     '/assets/images/template-13/photo5.webp',
   ];
 
-  const mapIframeSrc = card.map_url && card.map_url.includes('google.com/maps') 
-    ? card.map_url 
-    : `https://maps.google.com/maps?q=${encodeURIComponent(card.venue_address || card.venue_name || '')}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+  const mapIframeSrc = getMapIframeSrc(card);
 
   return (
     <div className="t13-wrapper">

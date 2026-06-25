@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getMapIframeSrc } from '@/lib/mapUtils';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-10.css';
 
@@ -108,9 +109,7 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
   const coverImage = card.cover_image_url || '/templates/template-10/assets/images/cover_photo.png';
   const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : ['/templates/template-10/assets/images/cover_photo.png'];
 
-  const mapIframeSrc = card.map_url && card.map_url.includes('google.com/maps') 
-    ? card.map_url 
-    : `https://maps.google.com/maps?q=${encodeURIComponent(card.venue_address || card.venue_name || '')}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+  const mapIframeSrc = getMapIframeSrc(card);
 
   return (
     <div className="t10-wrapper">

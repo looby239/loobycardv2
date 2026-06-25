@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import imageCompression from 'browser-image-compression';
+
 interface DraftData {
   id: string;
   customer_name: string;
@@ -225,9 +227,34 @@ function CreateWizard() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    let processedFiles: File[] = Array.from(files);
+
+    if (type === 'cover' || type === 'album') {
+      const options = {
+        maxSizeMB: 5,
+        maxWidthOrHeight: 2048,
+        useWebWorker: true,
+      };
+
+      try {
+        const compressedPromises = processedFiles.map(async (file) => {
+          if (file.size > 5 * 1024 * 1024) {
+            return await imageCompression(file, options);
+          }
+          return file;
+        });
+        processedFiles = await Promise.all(compressedPromises);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        alert('Có lỗi xảy ra khi nén ảnh, vui lòng thử lại.');
+        e.target.value = '';
+        return;
+      }
+    }
+
     if (type === 'cover') {
       setUploadingCover(true);
-      const file = files[0];
+      const file = processedFiles[0];
       const data = new FormData();
       data.append('file', file);
       data.append('bucket', 'card-images');
@@ -253,7 +280,7 @@ function CreateWizard() {
       }
 
       setUploadingAlbum(true);
-      const uploadPromises = Array.from(files).slice(0, spaceLeft).map(async (file) => {
+      const uploadPromises = processedFiles.slice(0, spaceLeft).map(async (file) => {
         const data = new FormData();
         data.append('file', file);
         data.append('bucket', 'card-images');
@@ -275,7 +302,7 @@ function CreateWizard() {
       setUploadingAlbum(false);
     } else if (type === 'music') {
       setUploadingMusic(true);
-      const file = files[0];
+      const file = processedFiles[0];
       const data = new FormData();
       data.append('file', file);
       data.append('bucket', 'card-music');
@@ -886,7 +913,7 @@ function CreateWizard() {
                             disabled={uploadingCover}
                           />
                         </label>
-                        <p className="text-slate-400 text-[10px]">Tải lên file PNG, JPG, WEBP. Dung lượng nhỏ hơn 5MB.</p>
+                        <p className="text-slate-400 text-[10px]">Tải lên file PNG, JPG, WEBP. Hệ thống sẽ tự nén nếu ảnh &gt; 5MB.</p>
                         {errors.cover && <span className="text-xs text-red-500 font-semibold block">{errors.cover}</span>}
                       </div>
                     </div>

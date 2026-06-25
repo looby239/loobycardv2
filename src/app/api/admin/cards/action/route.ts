@@ -176,7 +176,7 @@ export async function POST(request: Request) {
         'groom_bank_name', 'groom_bank_account', 'groom_bank_holder',
         'bride_bank_name', 'bride_bank_account', 'bride_bank_holder',
         'dress_code', 'payment_status', 'status',
-        'cover_image_url', 'album_images', 'music_url'
+        'cover_image_url', 'music_url'
       ];
 
       for (const field of allowedFields) {
@@ -200,7 +200,37 @@ export async function POST(request: Request) {
         .eq('id', cardId);
 
       if (updateError) {
-        throw new Error(`Failed to update card: ${updateError.message}`);
+        throw new Error(updateError.message);
+      }
+
+      // Update Album Images
+      if (editData.album_images !== undefined && Array.isArray(editData.album_images)) {
+        // First clean existing album images for this card ID
+        const { error: deleteImagesError } = await supabaseAdmin
+          .from('card_images')
+          .delete()
+          .eq('card_id', cardId);
+
+        if (deleteImagesError) {
+          console.error('Error cleaning old images:', deleteImagesError);
+        }
+
+        // Bulk insert new album images
+        if (editData.album_images.length > 0) {
+          const imageRecords = editData.album_images.map((imgUrl: string, index: number) => ({
+            card_id: cardId,
+            image_url: imgUrl,
+            sort_order: index,
+          }));
+
+          const { error: insertImagesError } = await supabaseAdmin
+            .from('card_images')
+            .insert(imageRecords);
+
+          if (insertImagesError) {
+            console.error('Error inserting new images:', insertImagesError);
+          }
+        }
       }
 
       return NextResponse.json({ success: true, message: 'Cập nhật thiệp cưới thành công' });

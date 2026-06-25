@@ -45,6 +45,9 @@ interface CardRecord {
   bride_bank_account?: string | null;
   bride_bank_holder?: string | null;
   dress_code?: string | null;
+  cover_image_url?: string | null;
+  album_images?: string[];
+  card_images?: { image_url: string; sort_order: number }[];
 }
 
 export default function AdminCardsPage() {
@@ -307,11 +310,24 @@ export default function AdminCardsPage() {
     try {
       const { data, error } = await supabase
         .from('cards')
-        .select('*')
+        .select('*, card_images(image_url, sort_order)')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      if (data) setCards(data);
+      if (data) {
+        const formattedData = data.map(card => {
+          let albumImages: string[] = [];
+          if (card.card_images && card.card_images.length > 0) {
+            const sortedImages = [...card.card_images].sort((a, b) => a.sort_order - b.sort_order);
+            albumImages = sortedImages.map(img => img.image_url);
+          }
+          return {
+            ...card,
+            album_images: albumImages
+          };
+        });
+        setCards(formattedData);
+      }
     } catch (err) {
       console.error('Error fetching cards:', err);
       alert('Không thể kết nối tải danh sách thiệp cưới.');

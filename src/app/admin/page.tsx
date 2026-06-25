@@ -80,6 +80,7 @@ export default function AdminCardsPage() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAlbum, setUploadingAlbum] = useState(false);
+  const [uploadingMusic, setUploadingMusic] = useState(false);
 
   // Custom Confirm Modal states
   const [confirmModal, setConfirmModal] = useState<{
@@ -150,7 +151,7 @@ export default function AdminCardsPage() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'cover' | 'album') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'cover' | 'album' | 'music') => {
     if (!editingCard) return;
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -165,7 +166,7 @@ export default function AdminCardsPage() {
 
     try {
       const compressedPromises = processedFiles.map(async (file) => {
-        if (file.size > 5 * 1024 * 1024) {
+        if ((type === 'cover' || type === 'album') && file.size > 5 * 1024 * 1024) {
           return await imageCompression(file, options);
         }
         return file;
@@ -222,6 +223,25 @@ export default function AdminCardsPage() {
         album_images: [...(editFormData.album_images || []), ...validUrls] 
       });
       setUploadingAlbum(false);
+    } else if (type === 'music') {
+      setUploadingMusic(true);
+      const file = processedFiles[0];
+      const data = new FormData();
+      data.append('file', file);
+      data.append('bucket', 'card-music');
+      data.append('folder', editingCard.id);
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: data });
+        const resJson = await res.json();
+        if (resJson.url) {
+          setEditFormData({ ...editFormData, music_url: resJson.url });
+        }
+      } catch (err) {
+        console.error('Upload music error:', err);
+      } finally {
+        setUploadingMusic(false);
+      }
     }
   };
 
@@ -1248,6 +1268,38 @@ export default function AdminCardsPage() {
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    {/* Music URL */}
+                    <div className="pt-4 border-t border-slate-100">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nhạc nền (URL hoặc Upload)</label>
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <input
+                            type="url"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
+                            value={editFormData.music_url || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, music_url: e.target.value })}
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
+                          <Upload size={16} />
+                          <span>{uploadingMusic ? 'Đang tải lên...' : 'Tải lên mp3'}</span>
+                          <input
+                            type="file"
+                            accept="audio/mpeg,audio/mp3,audio/wav"
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(e, 'music')}
+                            disabled={uploadingMusic}
+                          />
+                        </label>
+                      </div>
+                      {editFormData.music_url && (
+                        <div className="mt-2">
+                          <audio controls src={editFormData.music_url} className="w-full h-10" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

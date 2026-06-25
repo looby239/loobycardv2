@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Heart, Search, CheckCircle, ShieldAlert, Sparkles, Check, Globe, RefreshCw, Layers, BarChart2, Edit2, Trash2, X, LogOut } from 'lucide-react';
+import { Heart, Search, CheckCircle, ShieldAlert, Sparkles, Check, Globe, RefreshCw, Layers, BarChart2, Edit2, Trash2, X, LogOut, Upload, ChevronUp, ChevronDown } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 interface CardRecord {
   id: string;
@@ -74,6 +75,8 @@ export default function AdminCardsPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editTab, setEditTab] = useState<'customer' | 'couple' | 'event' | 'images'>('customer');
   const [savingEdit, setSavingEdit] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingAlbum, setUploadingAlbum] = useState(false);
 
   // Custom Confirm Modal states
   const [confirmModal, setConfirmModal] = useState<{
@@ -142,6 +145,101 @@ export default function AdminCardsPage() {
     } finally {
       setSavingEdit(false);
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'cover' | 'album') => {
+    if (!editingCard) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    let processedFiles: File[] = Array.from(files);
+
+    const options = {
+      maxSizeMB: 5,
+      maxWidthOrHeight: 2048,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedPromises = processedFiles.map(async (file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          return await imageCompression(file, options);
+        }
+        return file;
+      });
+      processedFiles = await Promise.all(compressedPromises);
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      alert('Có lỗi xảy ra khi nén ảnh, vui lòng thử lại.');
+      e.target.value = '';
+      return;
+    }
+
+    if (type === 'cover') {
+      setUploadingCover(true);
+      const file = processedFiles[0];
+      const data = new FormData();
+      data.append('file', file);
+      data.append('bucket', 'card-images');
+      data.append('folder', editingCard.id);
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: data });
+        const resJson = await res.json();
+        if (resJson.url) {
+          setEditFormData({ ...editFormData, cover_image_url: resJson.url });
+        }
+      } catch (err) {
+        console.error('Upload cover error:', err);
+      } finally {
+        setUploadingCover(false);
+      }
+    } else if (type === 'album') {
+      setUploadingAlbum(true);
+      const uploadPromises = processedFiles.map(async (file) => {
+        const data = new FormData();
+        data.append('file', file);
+        data.append('bucket', 'card-images');
+        data.append('folder', editingCard.id);
+
+        try {
+          const res = await fetch('/api/upload', { method: 'POST', body: data });
+          const resJson = await res.json();
+          return resJson.url || null;
+        } catch (err) {
+          console.error(err);
+          return null;
+        }
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      const validUrls = uploadedUrls.filter((url): url is string => url !== null);
+      setEditFormData({ 
+        ...editFormData, 
+        album_images: [...(editFormData.album_images || []), ...validUrls] 
+      });
+      setUploadingAlbum(false);
+    }
+  };
+
+  const moveAlbumImage = (index: number, direction: 'up' | 'down') => {
+    const list = [...(editFormData.album_images || [])];
+    if (direction === 'up' && index > 0) {
+      const temp = list[index];
+      list[index] = list[index - 1];
+      list[index - 1] = temp;
+    } else if (direction === 'down' && index < list.length - 1) {
+      const temp = list[index];
+      list[index] = list[index + 1];
+      list[index + 1] = temp;
+    }
+    setEditFormData({ ...editFormData, album_images: list });
+  };
+
+  const removeAlbumImage = (index: number) => {
+    const list = [...(editFormData.album_images || [])];
+    list.splice(index, 1);
+    setEditFormData({ ...editFormData, album_images: list });
   };
 
 
@@ -1039,37 +1137,98 @@ export default function AdminCardsPage() {
 
                 {editTab === 'images' && (
                   <div className="space-y-6">
+                    {/* Cover Image */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Ảnh bìa (URL)</label>
-                      <input
-                        type="url"
-                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
-                        value={editFormData.cover_image_url || ''}
-                        onChange={(e) => setEditFormData({ ...editFormData, cover_image_url: e.target.value })}
-                        placeholder="https://..."
-                      />
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ảnh bìa (URL hoặc Upload)</label>
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <input
+                            type="url"
+                            className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
+                            value={editFormData.cover_image_url || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, cover_image_url: e.target.value })}
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
+                          <Upload size={16} />
+                          <span>{uploadingCover ? 'Đang tải lên...' : 'Tải lên'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(e, 'cover')}
+                            disabled={uploadingCover}
+                          />
+                        </label>
+                      </div>
                       {editFormData.cover_image_url && (
-                        <div className="mt-2 h-32 w-32 rounded-xl overflow-hidden shadow-sm">
+                        <div className="mt-2 h-32 w-32 rounded-xl overflow-hidden shadow-sm relative group">
                           <img src={editFormData.cover_image_url} alt="Cover preview" className="w-full h-full object-cover" />
                         </div>
                       )}
                     </div>
+
+                    {/* Album Images */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Album ảnh cưới (Mỗi URL 1 dòng)</label>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Album ảnh cưới</label>
+                      <div className="flex gap-4 mb-2">
+                        <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
+                          <Upload size={16} />
+                          <span>{uploadingAlbum ? 'Đang tải lên...' : 'Tải lên thêm ảnh'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={(e) => handleFileUpload(e, 'album')}
+                            disabled={uploadingAlbum}
+                          />
+                        </label>
+                      </div>
+
                       <textarea
-                        rows={6}
-                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850 font-mono text-xs whitespace-pre"
+                        rows={3}
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850 font-mono text-xs whitespace-pre mb-2"
                         value={(editFormData.album_images || []).join('\n')}
                         onChange={(e) => {
                           const urls = e.target.value.split('\n').map(u => u.trim()).filter(u => u);
                           setEditFormData({ ...editFormData, album_images: urls });
                         }}
-                        placeholder="https://..."
+                        placeholder="Có thể sửa trực tiếp URL tại đây (mỗi URL 1 dòng)"
                       />
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {(editFormData.album_images || []).map((url: string, i: number) => (
-                          <div key={i} className="h-16 w-16 rounded-lg overflow-hidden shadow-sm bg-slate-100">
-                            <img src={url} alt={`Album ${i}`} className="w-full h-full object-cover" />
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                        {(editFormData.album_images || []).map((url: string, index: number) => (
+                          <div key={index} className="relative group bg-slate-100 rounded-xl overflow-hidden aspect-[3/4] border border-slate-200">
+                            <img src={url} alt={`Album ${index}`} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => moveAlbumImage(index, 'up')}
+                                  disabled={index === 0}
+                                  className="p-1.5 bg-white text-slate-700 rounded-lg hover:bg-slate-100 disabled:opacity-50"
+                                >
+                                  <ChevronUp size={16} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveAlbumImage(index, 'down')}
+                                  disabled={index === (editFormData.album_images || []).length - 1}
+                                  className="p-1.5 bg-white text-slate-700 rounded-lg hover:bg-slate-100 disabled:opacity-50"
+                                >
+                                  <ChevronDown size={16} />
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeAlbumImage(index)}
+                                className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>

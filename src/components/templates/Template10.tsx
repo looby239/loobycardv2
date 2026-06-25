@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
+import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-10.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -14,15 +15,27 @@ interface TemplateProps {
   previewMode?: boolean;
 }
 
+interface Wish {
+  id: number;
+  guest_name: string;
+  message: string;
+  created_at: string;
+}
+
 export default function Template10({ card, previewMode = false }: TemplateProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [rsvpName, setRsvpName] = useState('');
   const [rsvpStatus, setRsvpStatus] = useState('yes');
   const [rsvpCount, setRsvpCount] = useState(1);
-  const [rsvpMessage, setRsvpMessage] = useState('');
   const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+
+  const [wishes, setWishes] = useState<Wish[]>([]);
+  const [loadingWishes, setLoadingWishes] = useState(false);
+  const [wishName, setWishName] = useState('');
+  const [wishText, setWishText] = useState('');
+  const [wishSubmitting, setWishSubmitting] = useState(false);
 
   useEffect(() => {
     if (!card.event_date) return;
@@ -48,6 +61,36 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
     return () => clearInterval(interval);
   }, [card.event_date]);
 
+  useEffect(() => {
+    if (previewMode) {
+      setWishes([
+        { id: 1, guest_name: 'Chị Phương Linh', message: 'Chúc hai em trăm năm hạnh phúc, mãi mãi bên nhau đầu bạc răng long nhé!', created_at: new Date().toISOString() },
+        { id: 2, guest_name: 'Anh Tiến Đạt', message: 'Chúc mừng ngày trọng đại của hai bạn! Chúc cuộc sống hôn nhân luôn tràn đầy tiếng cười.', created_at: new Date().toISOString() },
+      ]);
+      return;
+    }
+
+    const fetchWishes = async () => {
+      setLoadingWishes(true);
+      try {
+        const { data, error } = await supabase
+          .from('guest_messages')
+          .select('id, guest_name, message, created_at')
+          .eq('card_id', card.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setWishes(data);
+      } catch (err) {
+        console.error('Error fetching guest wishes:', err);
+      } finally {
+        setLoadingWishes(false);
+      }
+    };
+
+    fetchWishes();
+  }, [card.id, previewMode]);
+
   const handleRsvpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (previewMode) {
@@ -65,7 +108,7 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
           guest_name: rsvpName,
           attend_status: rsvpStatus,
           guests_count: rsvpCount,
-          message: rsvpMessage.trim() ? rsvpMessage.trim() : `Gửi từ thiệp cưới của ${card.groom_name} & ${card.bride_name}`,
+          message: `Gửi từ thiệp cưới của ${card.groom_name} & ${card.bride_name}`,
         }),
       });
 
@@ -81,6 +124,57 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
       alert('Lỗi gửi xác nhận RSVP.');
     } finally {
       setRsvpSubmitting(false);
+    }
+  };
+
+  const handleWishSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wishName.trim() || !wishText.trim()) return;
+
+    if (previewMode) {
+      const newWish = {
+        id: Date.now(),
+        guest_name: wishName,
+        message: wishText,
+        created_at: new Date().toISOString(),
+      };
+      setWishes([newWish, ...wishes]);
+      setWishName('');
+      setWishText('');
+      return;
+    }
+
+    setWishSubmitting(true);
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_id: card.id,
+          guest_name: wishName,
+          message: wishText,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        const newWishObj = {
+          id: data.data.id || Date.now(),
+          guest_name: wishName,
+          message: wishText,
+          created_at: new Date().toISOString(),
+        };
+        setWishes([newWishObj, ...wishes]);
+        setWishName('');
+        setWishText('');
+      } else {
+        alert(data.error || 'Lỗi gửi lời chúc.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi kết nối gửi lời chúc.');
+    } finally {
+      setWishSubmitting(false);
     }
   };
 
@@ -246,21 +340,42 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
                 <option value={3}>3 người</option>
               </select>
             </div>
-            <div className="form-group">
-              <label htmlFor="message">Lời chúc</label>
-              <textarea 
-                id="message" 
-                className="form-control" 
-                placeholder="Nhập lời chúc của bạn dành cho cô dâu chú rể..." 
-                rows={3} 
-                value={rsvpMessage} 
-                onChange={(e) => setRsvpMessage(e.target.value)} 
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit' }}
-              />
-            </div>
             <button type="submit" className="btn" style={{ width: '100%' }} disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi xác nhận'}</button>
           </form>
         </section>
+
+        {/* Guestbook Section */}
+        {card.plan_id !== 'basic' && (
+          <section className="guestbook" style={{ background: '#fef7ec', padding: '4rem 10%', textAlign: 'center' }}>
+            <h2 className="section-title">Sổ Lưu Bút</h2>
+            <p style={{ marginBottom: '2rem' }}>Hãy để lại những lời chúc tốt đẹp nhất dành cho chúng mình nhé.</p>
+            
+            <div style={{ background: '#fff', borderRadius: '15px', padding: '1.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', marginBottom: '2rem', maxHeight: '300px', overflowY: 'auto' }}>
+              {loadingWishes ? (
+                <p style={{ textAlign: 'center', opacity: 0.7 }}>Đang tải lời chúc...</p>
+              ) : wishes.length > 0 ? (
+                wishes.map((wish) => (
+                  <div key={wish.id} style={{ borderBottom: '1px solid #f1f1f1', paddingBottom: '1rem', marginBottom: '1rem', textAlign: 'left' }}>
+                    <strong style={{ color: 'var(--color-primary)', display: 'block', marginBottom: '0.3rem' }}>{wish.guest_name}</strong>
+                    <p style={{ margin: 0, fontSize: '0.95rem', color: '#555' }}>{wish.message}</p>
+                  </div>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', opacity: 0.7 }}>Chưa có lời chúc nào. Hãy là người đầu tiên gửi lời chúc nhé!</p>
+              )}
+            </div>
+            
+            <form onSubmit={handleWishSubmit} style={{ background: '#fff', padding: '1.5rem', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+              <div className="form-group">
+                <input type="text" className="form-control" placeholder="Tên của bạn" required value={wishName} onChange={(e) => setWishName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <textarea className="form-control" rows={3} placeholder="Viết lời chúc tốt đẹp gửi đến cô dâu chú rể..." required value={wishText} onChange={(e) => setWishText(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit' }}></textarea>
+              </div>
+              <button type="submit" className="btn" style={{ width: '100%' }} disabled={wishSubmitting}>{wishSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'}</button>
+            </form>
+          </section>
+        )}
 
         {/* Gift Section */}
         {card.groom_bank_account && (

@@ -72,7 +72,7 @@ export default function AdminCardsPage() {
   const [editingCard, setEditingCard] = useState<CardRecord | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editTab, setEditTab] = useState<'customer' | 'couple' | 'event'>('customer');
+  const [editTab, setEditTab] = useState<'customer' | 'couple' | 'event' | 'images'>('customer');
   const [savingEdit, setSavingEdit] = useState(false);
 
   // Custom Confirm Modal states
@@ -762,6 +762,17 @@ export default function AdminCardsPage() {
                 >
                   Sự kiện & Khác
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setEditTab('images')}
+                  className={`py-3 px-4 text-xs font-bold border-b-2 transition ${
+                    editTab === 'images'
+                      ? 'border-rose-500 text-rose-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Hình ảnh
+                </button>
               </div>
 
               {/* Modal Content / Form */}
@@ -1022,6 +1033,46 @@ export default function AdminCardsPage() {
                         value={editFormData.map_url || ''}
                         onChange={(e) => setEditFormData({ ...editFormData, map_url: e.target.value })}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {editTab === 'images' && (
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Ảnh bìa (URL)</label>
+                      <input
+                        type="url"
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
+                        value={editFormData.cover_image_url || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, cover_image_url: e.target.value })}
+                        placeholder="https://..."
+                      />
+                      {editFormData.cover_image_url && (
+                        <div className="mt-2 h-32 w-32 rounded-xl overflow-hidden shadow-sm">
+                          <img src={editFormData.cover_image_url} alt="Cover preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Album ảnh cưới (Mỗi URL 1 dòng)</label>
+                      <textarea
+                        rows={6}
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850 font-mono text-xs whitespace-pre"
+                        value={(editFormData.album_images || []).join('\n')}
+                        onChange={(e) => {
+                          const urls = e.target.value.split('\n').map(u => u.trim()).filter(u => u);
+                          setEditFormData({ ...editFormData, album_images: urls });
+                        }}
+                        placeholder="https://..."
+                      />
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {(editFormData.album_images || []).map((url: string, i: number) => (
+                          <div key={i} className="h-16 w-16 rounded-lg overflow-hidden shadow-sm bg-slate-100">
+                            <img src={url} alt={`Album ${i}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}

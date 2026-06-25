@@ -4,6 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-10.css';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 interface TemplateProps {
   card: CardData;
@@ -15,6 +19,7 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
   const [rsvpName, setRsvpName] = useState('');
   const [rsvpStatus, setRsvpStatus] = useState('yes');
   const [rsvpCount, setRsvpCount] = useState(1);
+  const [rsvpMessage, setRsvpMessage] = useState('');
   const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
@@ -60,7 +65,7 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
           guest_name: rsvpName,
           attend_status: rsvpStatus,
           guests_count: rsvpCount,
-          message: `Gửi từ thiệp cưới của ${card.groom_name} & ${card.bride_name}`,
+          message: rsvpMessage.trim() ? rsvpMessage.trim() : `Gửi từ thiệp cưới của ${card.groom_name} & ${card.bride_name}`,
         }),
       });
 
@@ -122,8 +127,8 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
         {/* Hero Section */}
         <section className="hero">
           <div className="hero-content">
-            <div style={{ marginBottom: '2rem' }}>
-              <img src={coverImage} alt="Ảnh cưới" style={{ width: '200px', height: '200px', objectFit: 'cover', borderRadius: '50%', border: '4px solid var(--color-gold)' }} />
+            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
+              <img src={coverImage} alt="Ảnh cưới" style={{ width: '280px', height: '280px', objectFit: 'cover', borderRadius: '50%', border: '4px solid var(--color-gold)' }} />
             </div>
             <h1 className="names">
               {card.bride_name} 
@@ -140,10 +145,37 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
           <section className="album">
             <h2 className="section-title">Khoảnh Khắc</h2>
             <p>Nhìn lại những kỷ niệm ngọt ngào của chúng mình</p>
-            <div className="gallery-grid">
-              {albumImages.map((imgUrl, i) => (
-                <img key={i} src={imgUrl} alt={`Gallery image ${i + 1}`} className="gallery-img" onClick={() => setLightboxImg(imgUrl)} style={{ cursor: 'pointer' }} />
-              ))}
+            <div style={{ marginTop: '2rem', padding: '0 10px' }}>
+              <Swiper
+                modules={[Pagination, Autoplay]}
+                spaceBetween={15}
+                slidesPerView={1.5}
+                centeredSlides={true}
+                loop={true}
+                pagination={{ clickable: true }}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                className="album-swiper"
+              >
+                {albumImages.map((imgUrl, i) => (
+                  <SwiperSlide key={i}>
+                    <div style={{ paddingBottom: '30px' }}>
+                      <img 
+                        src={imgUrl} 
+                        alt={`Gallery image ${i + 1}`} 
+                        onClick={() => setLightboxImg(imgUrl)} 
+                        style={{ 
+                          cursor: 'pointer', 
+                          width: '100%', 
+                          height: '350px', 
+                          objectFit: 'cover', 
+                          borderRadius: '15px',
+                          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                        }} 
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           </section>
         )}
@@ -213,6 +245,18 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
                 <option value={2}>2 người</option>
                 <option value={3}>3 người</option>
               </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="message">Lời chúc</label>
+              <textarea 
+                id="message" 
+                className="form-control" 
+                placeholder="Nhập lời chúc của bạn dành cho cô dâu chú rể..." 
+                rows={3} 
+                value={rsvpMessage} 
+                onChange={(e) => setRsvpMessage(e.target.value)} 
+                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit' }}
+              />
             </div>
             <button type="submit" className="btn" style={{ width: '100%' }} disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi xác nhận'}</button>
           </form>

@@ -161,9 +161,13 @@ export default async function PublicCardPage({ params }: PageProps) {
     ? card.card_images.map((img: any) => img.image_url)
     : [];
 
+  const { expandMapUrl } = await import('@/lib/mapUtils');
+  const expandedMapUrl = await expandMapUrl(card.map_url);
+
   const cardData = {
     ...card,
     album_images: albumImages,
+    map_url: expandedMapUrl,
   };
 
   return <TemplateResolver card={cardData} previewMode={false} />;

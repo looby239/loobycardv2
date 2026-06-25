@@ -20,3 +20,19 @@ export function getMapIframeSrc(card: { map_url?: string | null, venue_address?:
 
   return mapIframeSrc;
 }
+
+export async function expandMapUrl(url: string | null | undefined): Promise<string | null | undefined> {
+  if (!url) return url;
+  if (url.includes('maps.app.goo.gl') || url.includes('goo.gl/maps')) {
+    try {
+      const res = await fetch(url, { redirect: 'manual' });
+      const location = res.headers.get('location');
+      if (location) {
+        return location;
+      }
+    } catch (e) {
+      console.error('Error expanding map url', e);
+    }
+  }
+  return url;
+}

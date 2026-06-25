@@ -37,9 +37,13 @@ export default async function PreviewPage({ params }: PageProps) {
     ? card.card_images.map((img: any) => img.image_url)
     : [];
 
+  const { expandMapUrl } = await import('@/lib/mapUtils');
+  const expandedMapUrl = await expandMapUrl(card.map_url);
+
   const cardData = {
     ...card,
     album_images: albumImages,
+    map_url: expandedMapUrl,
   };
 
   let planName = 'Gói Cơ Bản';

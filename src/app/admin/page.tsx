@@ -233,12 +233,18 @@ export default function AdminCardsPage() {
 
       try {
         const res = await fetch('/api/upload', { method: 'POST', body: data });
+        if (!res.ok) {
+          throw new Error(res.status === 413 ? 'Kích thước file nhạc quá lớn (tối đa 4.5MB)' : 'Lỗi tải lên từ máy chủ');
+        }
         const resJson = await res.json();
         if (resJson.url) {
           setEditFormData({ ...editFormData, music_url: resJson.url });
+        } else {
+          throw new Error(resJson.error || 'Không nhận được URL nhạc');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Upload music error:', err);
+        alert(err.message || 'Lỗi tải lên mp3');
       } finally {
         setUploadingMusic(false);
       }
@@ -1288,7 +1294,7 @@ export default function AdminCardsPage() {
                           <span>{uploadingMusic ? 'Đang tải lên...' : 'Tải lên mp3'}</span>
                           <input
                             type="file"
-                            accept="audio/mpeg,audio/mp3,audio/wav"
+                            accept=".mp3,audio/*"
                             className="hidden"
                             onChange={(e) => handleFileUpload(e, 'music')}
                             disabled={uploadingMusic}

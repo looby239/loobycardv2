@@ -310,12 +310,18 @@ function CreateWizard() {
 
       try {
         const res = await fetch('/api/upload', { method: 'POST', body: data });
+        if (!res.ok) {
+          throw new Error(res.status === 413 ? 'Kích thước file nhạc quá lớn (tối đa 4.5MB)' : 'Lỗi tải lên từ máy chủ');
+        }
         const resJson = await res.json();
         if (resJson.url) {
           saveDraft({ ...formData, music_url: resJson.url });
+        } else {
+          throw new Error(resJson.error || 'Không nhận được URL nhạc');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Upload music error:', err);
+        alert(err.message || 'Lỗi tải lên mp3');
       } finally {
         setUploadingMusic(false);
       }
@@ -1123,9 +1129,15 @@ function CreateWizard() {
                               <span>{uploadingMusic ? 'Đang tải lên...' : 'Chọn file MP3'}</span>
                               <input
                                 type="file"
-                                accept="audio/mp3,audio/*"
+                                accept=".mp3,audio/*"
                                 className="hidden"
-                                onChange={(e) => handleFileUpload(e, 'music')}
+                                onChange={(e) => {
+                                  try {
+                                    handleFileUpload(e, 'music');
+                                  } catch (error) {
+                                    alert('Có lỗi xảy ra khi tải nhạc lên. Vui lòng thử lại.');
+                                  }
+                                }}
                                 disabled={uploadingMusic}
                               />
                             </label>

@@ -220,10 +220,9 @@ export default function TemplatesPage() {
             {/* Notch */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-5 w-32 bg-slate-800 rounded-b-xl z-20"></div>
             
-            {/* Content iframe */}
             <iframe
               ref={iframeRef}
-              src={activeTemplate.previewUrl}
+              src={`${activeTemplate.previewUrl}${activeTemplate.previewUrl.includes('?') ? '&' : '?'}autoOpen=true`}
               className="w-full h-full border-none pt-4 bg-white"
               title="Template Live Preview"
               onLoad={startAutoScroll}

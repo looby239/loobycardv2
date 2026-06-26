@@ -46,6 +46,23 @@ export default async function PreviewPage({ params }: PageProps) {
     map_url: expandedMapUrl,
   };
 
+  // Fetch CSS override for this template from admin config
+  let cssOverride = '';
+  try {
+    const templateId = card.template_id || 'template-10';
+    const { data: templateConfig } = await supabaseAdmin
+      .from('template_configs')
+      .select('css_override')
+      .eq('id', templateId)
+      .maybeSingle();
+    if (templateConfig?.css_override) {
+      cssOverride = templateConfig.css_override;
+    }
+  } catch (e) {
+    // Non-fatal: if template_configs table doesn't exist yet, just skip
+    console.warn('Could not fetch template css_override:', e);
+  }
+
   let planName = 'Gói Cơ Bản';
   let durationText = '1 tháng';
   if (card.plan_id === 'premium') {
@@ -71,7 +88,7 @@ export default async function PreviewPage({ params }: PageProps) {
         </div>
       </div>
       
-      <TemplateResolver card={cardData} previewMode={true} />
+      <TemplateResolver card={cardData} previewMode={true} cssOverride={cssOverride} />
     </div>
   );
 }

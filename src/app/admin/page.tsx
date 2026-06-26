@@ -560,6 +560,12 @@ export default function AdminCardsPage() {
           >
             Analytics
           </Link>
+          <Link
+            href="/admin/templates"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition"
+          >
+            Templates
+          </Link>
         </div>
 
         {/* Tab Filters */}

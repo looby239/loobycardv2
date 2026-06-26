@@ -192,4 +192,24 @@ ALTER TABLE page_views ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow service role full access on page_views"
   ON page_views FOR ALL USING (true) WITH CHECK (true);
 
+-- ============================================================
+-- TEMPLATE CONFIGS: per-template admin settings
+-- Run in Supabase SQL Editor to enable /admin/templates page
+-- ============================================================
+CREATE TABLE IF NOT EXISTS template_configs (
+  id TEXT PRIMARY KEY,                   -- 'template-10' ... 'template-19'
+  name TEXT NOT NULL DEFAULT '',
+  description TEXT DEFAULT '',
+  thumbnail_url TEXT,                    -- Custom uploaded thumbnail URL
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  css_override TEXT NOT NULL DEFAULT '', -- Admin CSS injected into live render
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
+ALTER TABLE template_configs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow service role full access on template_configs"
+  ON template_configs FOR ALL USING (true) WITH CHECK (true);
+
+-- NOTE: Also create a Storage bucket named "template-thumbnails"
+-- with Public access enabled via Supabase dashboard > Storage.

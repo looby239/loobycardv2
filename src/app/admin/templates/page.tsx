@@ -694,7 +694,7 @@ export default function AdminTemplatesPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <Eye size={16} color="#6366f1" />
                       <span style={{ fontSize: 14, fontWeight: 700, color: '#1e1b4b' }}>Live Preview</span>
-                      <span style={{ fontSize: 11, color: '#94a3b8', background: '#f1f5f9', padding: '2px 8px', borderRadius: 20 }}>loobycard.com/preview/dasd</span>
+                      <span style={{ fontSize: 11, color: '#94a3b8', background: '#f1f5f9', padding: '2px 8px', borderRadius: 20 }}>/templates/{selectedTemplateId}/index.html</span>
                     </div>
                     <button
                       onClick={() => setCssPreviewKey(k => k + 1)}
@@ -708,7 +708,7 @@ export default function AdminTemplatesPage() {
                       <iframe
                         key={cssPreviewKey}
                         ref={cssPreviewRef}
-                        src="/preview/dasd"
+                        src={`/templates/${selectedTemplateId}/index.html`}
                         style={{ width: '100%', height: '100%', border: 'none' }}
                         title="Template Preview"
                       />
@@ -716,7 +716,7 @@ export default function AdminTemplatesPage() {
                   </div>
                   <div style={{ padding: '10px 16px', background: '#f8f9ff', borderTop: '1px solid #f1f5f9' }}>
                     <p style={{ fontSize: 11, color: '#94a3b8', margin: 0, textAlign: 'center' }}>
-                      ⚠️ Preview dùng card demo &quot;dasd&quot;. Nhấn <strong>Lưu &amp; Áp dụng</strong> rồi <strong>Refresh</strong> để xem kết quả.
+                      📋 Đây là preview mẫu tĩnh của <strong>{selectedTemplateId}</strong>. CSS override được áp dụng vào tất cả thiệp dùng mẫu này sau khi nhấn <strong>Lưu &amp; Áp dụng</strong>.
                     </p>
                   </div>
                 </div>

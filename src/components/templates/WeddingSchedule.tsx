@@ -28,7 +28,7 @@ export default function WeddingSchedule({ schedule, hasSchedule = false }: Weddi
         </p>
       </div>
 
-      <div className="relative border-l border-dashed border-[var(--color-gold,#d4af37)]/50 ml-8 mr-4 sm:mx-auto pl-8 pr-4 space-y-8 text-left max-w-md">
+      <div className="relative border-l border-dashed border-[var(--color-gold,#d4af37)]/50 mx-auto pl-8 pr-4 space-y-8 text-left w-full max-w-md">
         {schedule.map((item, index) => (
           <div key={index} className="relative group transition-all duration-300">
             {/* Circle Node */}

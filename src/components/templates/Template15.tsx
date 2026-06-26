@@ -479,7 +479,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* Timeline details */}
-        {card.plan_id !== 'basic' && (
+        {card.has_schedule && card.wedding_schedule && card.wedding_schedule.length > 0 && (
           <section className="timeline-section py-12 px-6 bg-[#faf8f5]/40 border-t border-[#c5a880]/20">
             <div className="section-title-wrapper flex items-center justify-center gap-2 mb-8 text-center">
               <span className="ornament-icon">❦</span>
@@ -488,34 +488,14 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             </div>
             <div className="timeline-container relative max-w-md mx-auto pl-8">
               <div className="timeline-line absolute left-3 top-2 bottom-2 w-0.5 bg-[#c5a880]"></div>
-
-              <div className="timeline-item relative space-y-1 mb-6 text-left">
-                <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
-                <div className="timeline-time text-xs font-bold text-[#8a5a2a]">11:00</div>
-                <h4 className="font-bold text-slate-800 text-sm">ĐÓN KHÁCH</h4>
-                <p className="text-xs text-slate-500">Đón tiếp khách mời, ký tên lưu niệm &amp; Chụp ảnh lưu niệm cùng Cô dâu, Chú rể.</p>
-              </div>
-
-              <div className="timeline-item relative space-y-1 mb-6 text-left">
-                <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
-                <div className="timeline-time text-xs font-bold text-[#8a5a2a]">11:30</div>
-                <h4 className="font-bold text-slate-800 text-sm">KHAI TIỆC</h4>
-                <p className="text-xs text-slate-500">MC tuyên bố bắt đầu, khai mạc tiệc mừng hạnh phúc.</p>
-              </div>
-
-              <div className="timeline-item relative space-y-1 mb-6 text-left">
-                <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
-                <div className="timeline-time text-xs font-bold text-[#8a5a2a]">11:45</div>
-                <h4 className="font-bold text-slate-800 text-sm">LÀM LỄ THÀNH HÔN</h4>
-                <p className="text-xs text-slate-500">Nghi thức cắt bánh, rót rượu giao bôi mừng ngày chung đôi.</p>
-              </div>
-
-              <div className="timeline-item relative space-y-1 text-left">
-                <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
-                <div className="timeline-time text-xs font-bold text-[#8a5a2a]">12:00</div>
-                <h4 className="font-bold text-slate-800 text-sm">NHẬP TIỆC ĐÃI KHÁCH</h4>
-                <p className="text-xs text-slate-500">Mời khách khui sâm banh dùng tiệc, giao lưu chúc mừng.</p>
-              </div>
+              {card.wedding_schedule.map((item, index) => (
+                <div key={index} className="timeline-item relative space-y-1 mb-6 text-left">
+                  <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
+                  <div className="timeline-time text-xs font-bold text-[#8a5a2a]">{item.time}</div>
+                  <h4 className="font-bold text-slate-800 text-sm">{item.title}</h4>
+                  {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
+                </div>
+              ))}
             </div>
           </section>
         )}

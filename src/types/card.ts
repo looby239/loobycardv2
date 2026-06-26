@@ -49,6 +49,10 @@ export interface CardData {
   expires_at?: string | null;
   deleted_at?: string | null;
   archived_at?: string | null;
+
+  // Wedding Schedule
+  has_schedule?: boolean;
+  wedding_schedule?: { time: string; title: string; description?: string }[] | null;
 }
 
 

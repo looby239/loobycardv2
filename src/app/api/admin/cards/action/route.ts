@@ -176,7 +176,7 @@ export async function POST(request: Request) {
         'groom_bank_name', 'groom_bank_account', 'groom_bank_holder',
         'bride_bank_name', 'bride_bank_account', 'bride_bank_holder',
         'dress_code', 'payment_status', 'status',
-        'cover_image_url', 'music_url'
+        'cover_image_url', 'music_url', 'has_schedule', 'wedding_schedule'
       ];
 
       for (const field of allowedFields) {

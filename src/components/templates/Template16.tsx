@@ -578,7 +578,7 @@ export default function Template16({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* Wedding Timeline Section */}
-        {card.plan_id !== 'basic' && (
+        {card.has_schedule && card.wedding_schedule && card.wedding_schedule.length > 0 && (
           <section className="timeline-section">
             <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
@@ -587,51 +587,16 @@ export default function Template16({ card, previewMode = false }: TemplateProps)
             </div>
             <div className="timeline-container">
               <div className="timeline-line"></div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">17:00</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>ĐÓN KHÁCH</h4>
-                  <p>Đón tiếp khách mời chụp ảnh lưu niệm cùng Cô dâu &amp; Chú rể tại sảnh tiệc</p>
+              {card.wedding_schedule.map((item, index) => (
+                <div key={index} className="timeline-item">
+                  <div className="timeline-time">{item.time}</div>
+                  <div className="timeline-badge"></div>
+                  <div className="timeline-content">
+                    <h4>{item.title}</h4>
+                    {item.description && <p>{item.description}</p>}
+                  </div>
                 </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">18:00</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>KHAI TIỆC</h4>
-                  <p>MC tuyên bố bắt đầu, tiết mục múa khai vị chào mừng quan khách</p>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">18:15</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>NGHI THỨC HÔN LỄ</h4>
-                  <p>Rót rượu hồng chúc mừng, cắt bánh cưới và đại diện gia đình cảm ơn</p>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">18:30</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>NHẬP TIỆC ĐÃI KHÁCH</h4>
-                  <p>Dùng tiệc đãi khách ấm cúng, ban nhạc Acoustic phục vụ văn nghệ chúc mừng</p>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">21:00</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>CẢM ƠN TIỄN KHÁCH</h4>
-                  <p>Cô dâu, chú rể chụp hình lưu niệm cùng các khách mời trước khi ra về</p>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
         )}

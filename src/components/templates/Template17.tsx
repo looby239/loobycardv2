@@ -475,53 +475,23 @@ export default function Template17({ card, previewMode = false }: TemplateProps)
         </section>
 
         {/* Wedding Timeline Section */}
-        {card.plan_id !== 'basic' && (
+        {card.has_schedule && card.wedding_schedule && card.wedding_schedule.length > 0 && (
           <section className="timeline-section">
             <div className="section-title-wrapper">
               <h2 className="section-title">LỊCH TRÌNH NGÀY CƯỚI</h2>
             </div>
             <div className="timeline-container">
               <div className="timeline-line"></div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">17:30</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>Đón khách</h4>
+              {card.wedding_schedule.map((item, index) => (
+                <div key={index} className="timeline-item">
+                  <div className="timeline-time">{item.time}</div>
+                  <div className="timeline-badge"></div>
+                  <div className="timeline-content">
+                    <h4>{item.title}</h4>
+                    {item.description && <p>{item.description}</p>}
+                  </div>
                 </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">18:30</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>Khai tiệc</h4>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">18:45</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>Rót rượu, cắt bánh</h4>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">19:00</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>Phục vụ món chính</h4>
-                </div>
-              </div>
-
-              <div className="timeline-item">
-                <div className="timeline-time">20:30</div>
-                <div className="timeline-badge"></div>
-                <div className="timeline-content">
-                  <h4>Chụp ảnh lưu niệm</h4>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
         )}

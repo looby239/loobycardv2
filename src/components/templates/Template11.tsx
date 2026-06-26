@@ -384,30 +384,21 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
             </div>
           </div>
 
-          {/* Detail Timeline (Static visual component like original) */}
-          <div className="timeline-box">
-            <h3>Chương Trình Tiệc Cưới</h3>
-            <div className="timeline-item">
-              <span className="time">17:30</span>
-              <span className="detail">Đón khách &amp; Chụp ảnh lưu niệm</span>
+          {/* Detail Timeline (Dynamic component mapping card.wedding_schedule if has_schedule is true) */}
+          {card.has_schedule && card.wedding_schedule && card.wedding_schedule.length > 0 && (
+            <div className="timeline-box">
+              <h3>Chương Trình Tiệc Cưới</h3>
+              {card.wedding_schedule.map((item, index) => (
+                <div key={index} className="timeline-item">
+                  <span className="time">{item.time}</span>
+                  <span className="detail">
+                    <strong style={{ display: 'block' }}>{item.title}</strong>
+                    {item.description && <span style={{ display: 'block', fontSize: '0.85em', opacity: 0.8, marginTop: '2px' }}>{item.description}</span>}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="timeline-item">
-              <span className="time">18:30</span>
-              <span className="detail">Khai mạc lễ cưới &amp; Làm lễ thành hôn</span>
-            </div>
-            <div className="timeline-item">
-              <span className="time">18:45</span>
-              <span className="detail">Nghi thức rót rượu, cắt bánh kem</span>
-            </div>
-            <div className="timeline-item">
-              <span className="time">19:00</span>
-              <span className="detail">Nhập tiệc đãi khách &amp; Chương trình văn nghệ</span>
-            </div>
-            <div className="timeline-item">
-              <span className="time">21:00</span>
-              <span className="detail">Kết thúc tiệc cưới &amp; Cảm ơn khách mời</span>
-            </div>
-          </div>
+          )}
         </section>
 
         {/* Photo Album Section */}

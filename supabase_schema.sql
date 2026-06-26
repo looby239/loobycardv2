@@ -163,6 +163,8 @@ CREATE TABLE IF NOT EXISTS guest_messages (
 -- ALTER TABLE cards ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
 -- ALTER TABLE cards ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 -- ALTER TABLE cards ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
+-- ALTER TABLE cards ADD COLUMN IF NOT EXISTS has_schedule BOOLEAN NOT NULL DEFAULT FALSE;
+-- ALTER TABLE cards ADD COLUMN IF NOT EXISTS wedding_schedule JSONB DEFAULT '[]'::jsonb;
 
 -- ============================================================
 -- ANALYTICS: page_views table (Run to create analytics tracking)

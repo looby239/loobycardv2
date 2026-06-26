@@ -48,6 +48,8 @@ interface CardRecord {
   cover_image_url?: string | null;
   album_images?: string[];
   card_images?: { image_url: string; sort_order: number }[];
+  has_schedule?: boolean;
+  wedding_schedule?: { time: string; title: string; description?: string }[] | null;
 }
 
 export default function AdminCardsPage() {
@@ -81,6 +83,57 @@ export default function AdminCardsPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAlbum, setUploadingAlbum] = useState(false);
   const [uploadingMusic, setUploadingMusic] = useState(false);
+
+  // Local schedule states for admin editing
+  const [adminScheduleTime, setAdminScheduleTime] = useState('');
+  const [adminScheduleTitle, setAdminScheduleTitle] = useState('');
+  const [adminScheduleDesc, setAdminScheduleDesc] = useState('');
+
+  const addAdminScheduleItem = () => {
+    if (!adminScheduleTime.trim() || !adminScheduleTitle.trim()) {
+      alert('Vui lòng nhập Giờ và Tiêu đề sự kiện');
+      return;
+    }
+    const newItem = {
+      time: adminScheduleTime.trim(),
+      title: adminScheduleTitle.trim(),
+      description: adminScheduleDesc.trim() || undefined
+    };
+    const currentList = editFormData.wedding_schedule || [];
+    setEditFormData({
+      ...editFormData,
+      wedding_schedule: [...currentList, newItem]
+    });
+    setAdminScheduleTime('');
+    setAdminScheduleTitle('');
+    setAdminScheduleDesc('');
+  };
+
+  const removeAdminScheduleItem = (index: number) => {
+    const currentList = [...(editFormData.wedding_schedule || [])];
+    currentList.splice(index, 1);
+    setEditFormData({
+      ...editFormData,
+      wedding_schedule: currentList
+    });
+  };
+
+  const moveAdminScheduleItem = (index: number, direction: 'up' | 'down') => {
+    const list = [...(editFormData.wedding_schedule || [])];
+    if (direction === 'up' && index > 0) {
+      const temp = list[index];
+      list[index] = list[index - 1];
+      list[index - 1] = temp;
+    } else if (direction === 'down' && index < list.length - 1) {
+      const temp = list[index];
+      list[index] = list[index + 1];
+      list[index + 1] = temp;
+    }
+    setEditFormData({
+      ...editFormData,
+      wedding_schedule: list
+    });
+  };
 
   // Custom Confirm Modal states
   const [confirmModal, setConfirmModal] = useState<{
@@ -1173,6 +1226,120 @@ export default function AdminCardsPage() {
                         value={editFormData.map_url || ''}
                         onChange={(e) => setEditFormData({ ...editFormData, map_url: e.target.value })}
                       />
+                    </div>
+
+                    {/* Admin Wedding Schedule Editor */}
+                    <div className="border-t border-slate-200 pt-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Hiển thị lịch trình cưới</label>
+                          <p className="text-[10px] text-slate-400">Cho phép bật/tắt hiển thị lịch trình trên thiệp cưới.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={editFormData.has_schedule || false}
+                            onChange={(e) => setEditFormData({ ...editFormData, has_schedule: e.target.checked })}
+                          />
+                          <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-600"></div>
+                        </label>
+                      </div>
+
+                      {editFormData.has_schedule && (
+                        <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+                          {/* Schedule List */}
+                          {editFormData.wedding_schedule && editFormData.wedding_schedule.length > 0 ? (
+                            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                              {editFormData.wedding_schedule.map((item: any, index: number) => (
+                                <div key={index} className="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-150 gap-3">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded font-mono shrink-0">
+                                        {item.time}
+                                      </span>
+                                      <h5 className="text-xs font-bold text-slate-800 truncate">{item.title}</h5>
+                                    </div>
+                                    {item.description && <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.description}</p>}
+                                  </div>
+                                  <div className="flex items-center gap-0.5 shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => moveAdminScheduleItem(index, 'up')}
+                                      disabled={index === 0}
+                                      className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-30 transition"
+                                    >
+                                      <ChevronUp size={14} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => moveAdminScheduleItem(index, 'down')}
+                                      disabled={index === editFormData.wedding_schedule.length - 1}
+                                      className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-30 transition"
+                                    >
+                                      <ChevronDown size={14} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeAdminScheduleItem(index)}
+                                      className="p-1 text-red-500 hover:bg-red-50 rounded transition"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic text-center py-3 bg-white rounded-lg border border-slate-200">
+                              Chưa có mốc lịch trình nào.
+                            </p>
+                          )}
+
+                          {/* Add Form */}
+                          <div className="bg-white p-3 rounded-lg border border-slate-150 space-y-2">
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[9px] font-bold text-slate-500 uppercase">Giờ</label>
+                                <input
+                                  type="text"
+                                  className="w-full p-2 border border-slate-200 rounded-md text-xs focus:outline-none bg-slate-50 font-mono text-slate-800"
+                                  placeholder="17:30"
+                                  value={adminScheduleTime}
+                                  onChange={(e) => setAdminScheduleTime(e.target.value)}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <label className="block text-[9px] font-bold text-slate-500 uppercase">Tiêu đề *</label>
+                                <input
+                                  type="text"
+                                  className="w-full p-2 border border-slate-200 rounded-md text-xs focus:outline-none bg-slate-50 text-slate-800"
+                                  placeholder="Đón khách"
+                                  value={adminScheduleTitle}
+                                  onChange={(e) => setAdminScheduleTitle(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[9px] font-bold text-slate-500 uppercase">Mô tả</label>
+                              <input
+                                type="text"
+                                className="w-full p-2 border border-slate-200 rounded-md text-xs focus:outline-none bg-slate-50 text-slate-800"
+                                placeholder="Mô tả ngắn..."
+                                value={adminScheduleDesc}
+                                onChange={(e) => setAdminScheduleDesc(e.target.value)}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={addAdminScheduleItem}
+                              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-1.5 px-2 rounded-md text-xs transition"
+                            >
+                              Thêm mốc sự kiện
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

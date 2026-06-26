@@ -47,6 +47,10 @@ export async function POST(request: Request) {
       bride_bank_account,
       bride_bank_holder,
       dress_code,
+
+      // Schedule fields
+      has_schedule,
+      wedding_schedule,
     } = cardData;
 
     // 1. Perform Slug Validation
@@ -118,6 +122,10 @@ export async function POST(request: Request) {
       bride_bank_account: bride_bank_account || null,
       bride_bank_holder: bride_bank_holder || null,
       dress_code: dress_code || null,
+
+      // Schedule fields mappings
+      has_schedule: has_schedule ?? false,
+      wedding_schedule: wedding_schedule || null,
     };
 
     // 3. Upsert Card in DB

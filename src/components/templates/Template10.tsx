@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
+import WeddingSchedule from './WeddingSchedule';
 import '@/styles/templates/template-10.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
@@ -347,6 +348,8 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
             </div>
           </div>
         </section>
+
+        <WeddingSchedule schedule={card.wedding_schedule} hasSchedule={card.has_schedule} />
 
         {/* RSVP Section */}
         {card.plan_id !== 'basic' && (

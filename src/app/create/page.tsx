@@ -64,6 +64,8 @@ interface DraftData {
   bride_bank_account: string;
   bride_bank_holder: string;
   dress_code: string;
+  has_schedule: boolean;
+  wedding_schedule: { time: string; title: string; description?: string }[];
 }
 
 const DEFAULT_DRAFT = (): DraftData => ({
@@ -102,6 +104,8 @@ const DEFAULT_DRAFT = (): DraftData => ({
   bride_bank_account: '',
   bride_bank_holder: '',
   dress_code: '',
+  has_schedule: false,
+  wedding_schedule: [],
 });
 
 const PLAN_PRICES: Record<string, number> = {
@@ -137,6 +141,48 @@ function CreateWizard() {
   
   // General validation errors for current step
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Local schedule item inputs
+  const [scheduleTime, setScheduleTime] = useState('');
+  const [scheduleTitle, setScheduleTitle] = useState('');
+  const [scheduleDesc, setScheduleDesc] = useState('');
+
+  const addScheduleItem = () => {
+    if (!scheduleTime.trim() || !scheduleTitle.trim()) {
+      alert('Vui lòng nhập Giờ và Tiêu đề sự kiện');
+      return;
+    }
+    const newItem = {
+      time: scheduleTime.trim(),
+      title: scheduleTitle.trim(),
+      description: scheduleDesc.trim() || undefined
+    };
+    const newList = [...(formData.wedding_schedule || []), newItem];
+    saveDraft({ ...formData, wedding_schedule: newList });
+    setScheduleTime('');
+    setScheduleTitle('');
+    setScheduleDesc('');
+  };
+
+  const removeScheduleItem = (index: number) => {
+    const newList = [...(formData.wedding_schedule || [])];
+    newList.splice(index, 1);
+    saveDraft({ ...formData, wedding_schedule: newList });
+  };
+
+  const moveScheduleItem = (index: number, direction: 'up' | 'down') => {
+    const list = [...(formData.wedding_schedule || [])];
+    if (direction === 'up' && index > 0) {
+      const temp = list[index];
+      list[index] = list[index - 1];
+      list[index - 1] = temp;
+    } else if (direction === 'down' && index < list.length - 1) {
+      const temp = list[index];
+      list[index] = list[index + 1];
+      list[index + 1] = temp;
+    }
+    saveDraft({ ...formData, wedding_schedule: list });
+  };
   
   // Submission
   const [saving, setSaving] = useState(false);
@@ -892,6 +938,130 @@ function CreateWizard() {
                       {errors.slug && <p className="text-xs text-red-500 mt-1 font-semibold">{errors.slug}</p>}
                     </div>
 
+                    {/* Wedding Schedule Input Section */}
+                    <div className="border-t border-slate-100 pt-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-700">Lịch trình cưới</label>
+                          <p className="text-slate-400 text-xs">Thêm các sự kiện chính trong ngày trọng đại của bạn.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={formData.has_schedule}
+                            onChange={(e) => saveDraft({ ...formData, has_schedule: e.target.checked })}
+                          />
+                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                        </label>
+                      </div>
+
+                      {formData.has_schedule && (
+                        <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/50">
+                          {/* Schedule Items List */}
+                          {formData.wedding_schedule && formData.wedding_schedule.length > 0 ? (
+                            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                              {formData.wedding_schedule.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100 shadow-sm gap-4"
+                                >
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md font-mono shrink-0">
+                                        {item.time}
+                                      </span>
+                                      <h5 className="text-sm font-bold text-slate-800 truncate">
+                                        {item.title}
+                                      </h5>
+                                    </div>
+                                    {item.description && (
+                                      <p className="text-xs text-slate-500 mt-1 truncate">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => moveScheduleItem(index, 'up')}
+                                      disabled={index === 0}
+                                      className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-30 transition"
+                                    >
+                                      <ChevronUp size={16} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => moveScheduleItem(index, 'down')}
+                                      disabled={index === formData.wedding_schedule.length - 1}
+                                      className="p-1 text-slate-400 hover:text-slate-800 disabled:opacity-30 transition"
+                                    >
+                                      <ChevronDown size={16} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeScheduleItem(index)}
+                                      className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 italic text-center py-4 bg-white rounded-xl border border-slate-200">
+                              Chưa có mốc sự kiện nào. Hãy thêm mốc sự kiện đầu tiên!
+                            </p>
+                          )}
+
+                          {/* Add New Item Form */}
+                          <div className="bg-white p-3 rounded-xl border border-slate-100 space-y-3">
+                            <h5 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Thêm mốc sự kiện</h5>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Giờ</label>
+                                <input
+                                  type="text"
+                                  className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800 font-mono"
+                                  placeholder="Ví dụ: 17:30"
+                                  value={scheduleTime}
+                                  onChange={(e) => setScheduleTime(e.target.value)}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Tiêu đề *</label>
+                                <input
+                                  type="text"
+                                  className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800"
+                                  placeholder="Ví dụ: Đón khách"
+                                  value={scheduleTitle}
+                                  onChange={(e) => setScheduleTitle(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Mô tả ngắn</label>
+                              <input
+                                type="text"
+                                className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800"
+                                placeholder="Ví dụ: Chụp ảnh lưu niệm tại Backdrop"
+                                value={scheduleDesc}
+                                onChange={(e) => setScheduleDesc(e.target.value)}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={addScheduleItem}
+                              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition"
+                            >
+                              Thêm vào lịch trình
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Custom domain notice for Luxury */}
                     {plan === 'luxury' && (
                       <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs space-y-1">
@@ -1225,6 +1395,7 @@ function CreateWizard() {
                       <p className="text-red-500 font-semibold flex items-center gap-1">✗ Chưa tải ảnh bìa</p>
                     )}
                     <p><strong>Số lượng ảnh album:</strong> {formData.album_images.length} ảnh</p>
+                    <p><strong>Lịch trình cưới:</strong> {formData.has_schedule ? `Có hiển thị (${formData.wedding_schedule?.length || 0} mốc sự kiện)` : 'Không hiển thị'}</p>
                   </div>
 
                   <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl space-y-2">

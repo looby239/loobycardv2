@@ -100,6 +100,22 @@ export default async function DomainPage({ params }: PageProps) {
     map_url: expandedMapUrl,
   };
 
-  return <TemplateResolver card={cardData} previewMode={false} />;
+  // Fetch CSS override for this template from admin config
+  let cssOverride = '';
+  try {
+    const templateId = card.template_id || 'template-10';
+    const { data: templateConfig } = await supabaseAdmin
+      .from('template_configs')
+      .select('css_override')
+      .eq('id', templateId)
+      .maybeSingle();
+    if (templateConfig?.css_override) {
+      cssOverride = templateConfig.css_override;
+    }
+  } catch (e) {
+    console.warn('Could not fetch template css_override:', e);
+  }
+
+  return <TemplateResolver card={cardData} previewMode={false} cssOverride={cssOverride} />;
 }
 

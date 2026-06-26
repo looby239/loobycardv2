@@ -78,7 +78,7 @@ export default function AdminCardsPage() {
   const [editingCard, setEditingCard] = useState<CardRecord | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editTab, setEditTab] = useState<'customer' | 'couple' | 'event' | 'images'>('customer');
+  const [editTab, setEditTab] = useState<'customer' | 'couple' | 'event' | 'content' | 'images'>('customer');
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAlbum, setUploadingAlbum] = useState(false);
@@ -963,6 +963,17 @@ export default function AdminCardsPage() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setEditTab('content')}
+                  className={`py-3 px-4 text-xs font-bold border-b-2 transition ${
+                    editTab === 'content'
+                      ? 'border-rose-500 text-rose-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Nội dung
+                </button>
+                <button
+                  type="button"
                   onClick={() => setEditTab('images')}
                   className={`py-3 px-4 text-xs font-bold border-b-2 transition ${
                     editTab === 'images'
@@ -1084,6 +1095,39 @@ export default function AdminCardsPage() {
                           value={editFormData.bride_role || ''}
                           onChange={(e) => setEditFormData({ ...editFormData, bride_role: e.target.value })}
                         />
+                      </div>
+                    </div>
+
+                    {/* Parents */}
+                    <div className="border-t border-slate-100 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2"><h4 className="font-semibold text-xs text-slate-400 uppercase tracking-wider">Phụ huynh Chú rể</h4></div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Tên Bố chú rể</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.groom_father_name || ''} onChange={(e) => setEditFormData({ ...editFormData, groom_father_name: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Tên Mẹ chú rể</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.groom_mother_name || ''} onChange={(e) => setEditFormData({ ...editFormData, groom_mother_name: e.target.value })} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs text-slate-500 mb-1">Địa chỉ nhà chú rể</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.groom_address || ''} onChange={(e) => setEditFormData({ ...editFormData, groom_address: e.target.value })} />
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2"><h4 className="font-semibold text-xs text-slate-400 uppercase tracking-wider">Phụ huynh Cô dâu</h4></div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Tên Bố cô dâu</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.bride_father_name || ''} onChange={(e) => setEditFormData({ ...editFormData, bride_father_name: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-500 mb-1">Tên Mẹ cô dâu</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.bride_mother_name || ''} onChange={(e) => setEditFormData({ ...editFormData, bride_mother_name: e.target.value })} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs text-slate-500 mb-1">Địa chỉ nhà cô dâu</label>
+                        <input type="text" className="w-full p-2 border border-slate-200 rounded-lg text-xs focus:outline-none bg-slate-50 text-slate-800" value={editFormData.bride_address || ''} onChange={(e) => setEditFormData({ ...editFormData, bride_address: e.target.value })} />
                       </div>
                     </div>
 
@@ -1346,6 +1390,41 @@ export default function AdminCardsPage() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {editTab === 'content' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Lời mời (Invitation Text)</label>
+                      <textarea
+                        rows={4}
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800 leading-relaxed"
+                        placeholder="Trân trọng kính mời..."
+                        value={editFormData.invitation_text || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, invitation_text: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Câu trích dẫn (Quote Text)</label>
+                      <textarea
+                        rows={3}
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800 leading-relaxed"
+                        placeholder="Tình yêu là hành trình dài nhất..."
+                        value={editFormData.quote_text || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, quote_text: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Lời cảm ơn (Thank You Text)</label>
+                      <textarea
+                        rows={3}
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800 leading-relaxed"
+                        placeholder="Xin chân thành cảm ơn..."
+                        value={editFormData.thank_you_text || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, thank_you_text: e.target.value })}
+                      />
                     </div>
                   </div>
                 )}

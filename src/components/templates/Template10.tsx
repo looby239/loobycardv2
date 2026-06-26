@@ -278,11 +278,11 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
               <Swiper
                 modules={[Pagination, Autoplay]}
                 spaceBetween={15}
-                slidesPerView={1.5}
-                centeredSlides={true}
-                loop={true}
+                slidesPerView={albumImages.length > 1 ? 1.5 : 1}
+                centeredSlides={albumImages.length > 1}
+                loop={albumImages.length >= 3}
                 pagination={{ clickable: true }}
-                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                autoplay={albumImages.length > 1 ? { delay: 3000, disableOnInteraction: false } : false}
                 className="album-swiper"
               >
                 {albumImages.map((imgUrl, i) => (

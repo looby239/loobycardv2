@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
@@ -36,6 +36,40 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
   const [wishName, setWishName] = useState('');
   const [wishText, setWishText] = useState('');
   const [wishSubmitting, setWishSubmitting] = useState(false);
+
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (musicPlaying) {
+      audioRef.current.pause();
+      setMusicPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setMusicPlaying(true);
+      }).catch(err => console.log(err));
+    }
+  };
+
+  useEffect(() => {
+    if (!card.music_url) return;
+    const playAudio = () => {
+      if (audioRef.current && !musicPlaying) {
+        audioRef.current.play().then(() => {
+          setMusicPlaying(true);
+          removeListeners();
+        }).catch(err => console.log(err));
+      }
+    };
+    const removeListeners = () => {
+      window.removeEventListener('click', playAudio);
+      window.removeEventListener('touchstart', playAudio);
+    };
+    window.addEventListener('click', playAudio);
+    window.addEventListener('touchstart', playAudio);
+    return () => removeListeners();
+  }, [card.music_url, musicPlaying]);
 
   useEffect(() => {
     if (!card.event_date) return;
@@ -315,34 +349,36 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
         </section>
 
         {/* RSVP Section */}
-        <section className="rsvp" style={{ background: 'rgba(255,255,255,0.8)' }}>
-          <h2 className="section-title">Xác Nhận Tham Dự</h2>
-          <p style={{ marginBottom: '2rem' }}>Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.</p>
-          
-          <form onSubmit={handleRsvpSubmit} style={{ background: '#fff', padding: '2rem', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-            <div className="form-group">
-              <label htmlFor="name">Tên của bạn</label>
-              <input type="text" id="name" className="form-control" placeholder="Nhập tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="attendance">Bạn sẽ tham dự chứ?</label>
-              <select id="attendance" className="form-control" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
-                <option value="yes">Chắc chắn rồi!</option>
-                <option value="no">Rất tiếc, tôi không thể tham gia</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="guests">Số người đi cùng</label>
-              <select id="guests" className="form-control" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
-                <option value={0}>Đi một mình</option>
-                <option value={1}>1 người</option>
-                <option value={2}>2 người</option>
-                <option value={3}>3 người</option>
-              </select>
-            </div>
-            <button type="submit" className="btn" style={{ width: '100%' }} disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi xác nhận'}</button>
-          </form>
-        </section>
+        {card.plan_id !== 'basic' && (
+          <section className="rsvp" style={{ background: 'rgba(255,255,255,0.8)' }}>
+            <h2 className="section-title">Xác Nhận Tham Dự</h2>
+            <p style={{ marginBottom: '2rem' }}>Sự hiện diện của quý khách là niềm vinh hạnh cho gia đình chúng tôi.</p>
+            
+            <form onSubmit={handleRsvpSubmit} style={{ background: '#fff', padding: '2rem', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+              <div className="form-group">
+                <label htmlFor="name">Tên của bạn</label>
+                <input type="text" id="name" className="form-control" placeholder="Nhập tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="attendance">Bạn sẽ tham dự chứ?</label>
+                <select id="attendance" className="form-control" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
+                  <option value="yes">Chắc chắn rồi!</option>
+                  <option value="no">Rất tiếc, tôi không thể tham gia</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="guests">Số người đi cùng</label>
+                <select id="guests" className="form-control" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
+                  <option value={0}>Đi một mình</option>
+                  <option value={1}>1 người</option>
+                  <option value={2}>2 người</option>
+                  <option value={3}>3 người</option>
+                </select>
+              </div>
+              <button type="submit" className="btn" style={{ width: '100%' }} disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi xác nhận'}</button>
+            </form>
+          </section>
+        )}
 
         {/* Guestbook Section */}
         {card.plan_id !== 'basic' && (
@@ -395,7 +431,50 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
             </div>
           </section>
         )}
+
+        {/* Footer */}
+        <footer className="wedding-footer" style={{ textAlign: 'center', padding: '3rem 1rem', marginTop: '2rem' }}>
+          <p className="footer-thank" style={{ fontStyle: 'italic', opacity: 0.8, fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>
+            {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!'}
+          </p>
+          {(!card.plan_id || card.plan_id === 'basic') && (
+            <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link" style={{ fontSize: '0.8rem', opacity: 0.6, textDecoration: 'none', color: 'inherit', display: 'block', marginTop: '0.5rem' }}>
+              ❦ loobycard.com
+            </a>
+          )}
+        </footer>
       </div>
+
+      {/* Background Music */}
+      {card.music_url && (
+        <>
+          <audio id="bg-music" ref={audioRef} src={card.music_url} loop></audio>
+          <button 
+            className="music-toggle-btn"
+            onClick={toggleMusic}
+            style={{
+              position: 'fixed',
+              bottom: '20px',
+              left: '20px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 999,
+              color: '#333',
+            }}
+            title="Bật/Tắt nhạc nền"
+          >
+            <i className={musicPlaying ? "fas fa-volume-up" : "fas fa-volume-mute"}></i>
+          </button>
+        </>
+      )}
 
       {/* Photo Lightbox Modal Overlay */}
       <div className={`lightbox-overlay ${lightboxImg ? 'active' : ''}`} id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}>

@@ -521,75 +521,77 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* RSVP Section */}
-        <section className="rsvp py-12 px-6 border-t border-[#c5a880]/20" id="rsvp-section">
-          <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
-            <span className="ornament-icon">❦</span>
-            <h2 className="section-title font-serif text-lg font-bold text-slate-800">XÁC NHẬN THAM DỰ</h2>
-            <span className="ornament-icon">❦</span>
-          </div>
-          <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Vui lòng phản hồi trước để chúng tôi chuẩn bị đón tiếp chu đáo nhất</p>
-
-          {rsvpSuccess ? (
-            <div className="py-8 text-center text-green-600 font-bold text-sm bg-green-50 border border-green-200 rounded-2xl max-w-md mx-auto">
-              <Check className="mx-auto" size={32} />
-              <p>Cảm ơn bạn đã phản hồi tham dự!</p>
+        {card.plan_id !== 'basic' && (
+          <section className="rsvp py-12 px-6 border-t border-[#c5a880]/20" id="rsvp-section">
+            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+              <span className="ornament-icon">❦</span>
+              <h2 className="section-title font-serif text-lg font-bold text-slate-800">XÁC NHẬN THAM DỰ</h2>
+              <span className="ornament-icon">❦</span>
             </div>
-          ) : (
-            <form onSubmit={handleRsvpSubmit} className="rsvp-form bg-white border border-[#c5a880]/30 p-6 rounded-2xl shadow-sm space-y-4 max-w-md mx-auto text-left">
-              <div className="form-group flex flex-col">
-                <label className="text-xs font-semibold text-slate-700 mb-1">Họ và tên của bạn *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nhập họ tên..."
-                  className="p-3 rounded-lg border border-slate-200 focus:outline-[#8a5a2a] bg-slate-50 text-sm"
-                  value={rsvpName}
-                  onChange={(e) => setRsvpName(e.target.value)}
-                />
-              </div>
+            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Vui lòng phản hồi trước để chúng tôi chuẩn bị đón tiếp chu đáo nhất</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {rsvpSuccess ? (
+              <div className="py-8 text-center text-green-600 font-bold text-sm bg-green-50 border border-green-200 rounded-2xl max-w-md mx-auto">
+                <Check className="mx-auto" size={32} />
+                <p>Cảm ơn bạn đã phản hồi tham dự!</p>
+              </div>
+            ) : (
+              <form onSubmit={handleRsvpSubmit} className="rsvp-form bg-white border border-[#c5a880]/30 p-6 rounded-2xl shadow-sm space-y-4 max-w-md mx-auto text-left">
                 <div className="form-group flex flex-col">
-                  <label className="text-xs font-semibold text-slate-700 mb-1">Bạn sẽ tham dự chứ? *</label>
-                  <select
-                    className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
-                    value={rsvpStatus}
-                    onChange={(e) => setRsvpStatus(e.target.value)}
-                  >
-                    <option value="yes">Chắc chắn tham gia</option>
-                    <option value="no">Tiếc quá, vắng mặt</option>
-                  </select>
+                  <label className="text-xs font-semibold text-slate-700 mb-1">Họ và tên của bạn *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nhập họ tên..."
+                    className="p-3 rounded-lg border border-slate-200 focus:outline-[#8a5a2a] bg-slate-50 text-sm"
+                    value={rsvpName}
+                    onChange={(e) => setRsvpName(e.target.value)}
+                  />
                 </div>
 
-                <div className="form-group flex flex-col">
-                  <label className="text-xs font-semibold text-slate-700 mb-1">Số người đi cùng</label>
-                  <select
-                    className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
-                    value={rsvpCount}
-                    onChange={(e) => setRsvpCount(Number(e.target.value))}
-                  >
-                    <option value={0}>Đi một mình</option>
-                    <option value={1}>1 người đi cùng</option>
-                    <option value={2}>2 người đi cùng</option>
-                    <option value={3}>3 người đi cùng</option>
-                  </select>
-                </div>
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="form-group flex flex-col">
+                    <label className="text-xs font-semibold text-slate-700 mb-1">Bạn sẽ tham dự chứ? *</label>
+                    <select
+                      className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
+                      value={rsvpStatus}
+                      onChange={(e) => setRsvpStatus(e.target.value)}
+                    >
+                      <option value="yes">Chắc chắn tham gia</option>
+                      <option value="no">Tiếc quá, vắng mặt</option>
+                    </select>
+                  </div>
 
-              <button
-                type="submit"
-                disabled={rsvpSubmitting}
-                className="w-full bg-[#8a5a2a] hover:bg-[#704820] text-white font-bold py-3.5 rounded-lg text-sm transition shadow flex items-center justify-center gap-1.5"
-              >
-                {rsvpSubmitting ? (
-                  <RefreshCw className="animate-spin" size={16} />
-                ) : (
-                  <span>Gửi xác nhận RSVP</span>
-                )}
-              </button>
-            </form>
-          )}
-        </section>
+                  <div className="form-group flex flex-col">
+                    <label className="text-xs font-semibold text-slate-700 mb-1">Số người đi cùng</label>
+                    <select
+                      className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
+                      value={rsvpCount}
+                      onChange={(e) => setRsvpCount(Number(e.target.value))}
+                    >
+                      <option value={0}>Đi một mình</option>
+                      <option value={1}>1 người đi cùng</option>
+                      <option value={2}>2 người đi cùng</option>
+                      <option value={3}>3 người đi cùng</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={rsvpSubmitting}
+                  className="w-full bg-[#8a5a2a] hover:bg-[#704820] text-white font-bold py-3.5 rounded-lg text-sm transition shadow flex items-center justify-center gap-1.5"
+                >
+                  {rsvpSubmitting ? (
+                    <RefreshCw className="animate-spin" size={16} />
+                  ) : (
+                    <span>Gửi xác nhận RSVP</span>
+                  )}
+                </button>
+              </form>
+            )}
+          </section>
+        )}
 
         {/* Guestbook Section */}
         {card.plan_id !== 'basic' && (
@@ -675,9 +677,11 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
           <p className="footer-thank text-center italic font-serif text-slate-500 text-sm mx-auto px-4">
             {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh lớn cho hai bên gia đình chúng tôi!'}
           </p>
-          <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link text-[10px] text-slate-400 hover:text-[#8a5a2a] block mt-6 font-semibold">
-            ❦ loobycard.com
-          </a>
+          {(!card.plan_id || card.plan_id === 'basic') && (
+            <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link text-[10px] text-slate-400 hover:text-[#8a5a2a] block mt-6 font-semibold">
+              ❦ loobycard.com
+            </a>
+          )}
         </footer>
 
         <img src="/assets/images/template-15/hoa.webp" className="bg-decor-bottom" alt="" />

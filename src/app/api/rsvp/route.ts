@@ -21,28 +21,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Card not found' }, { status: 404 });
     }
 
-    // 2. Enforce limits if basic plan
+    // 2. Basic plan does NOT support RSVP
     if (card.plan_id === 'basic') {
-      // Get rsvp_limit from pricing_plans
-      const { data: planData } = await supabaseAdmin
-        .from('pricing_plans')
-        .select('rsvp_limit')
-        .eq('id', 'basic')
-        .maybeSingle();
-
-      const { count, error: countError } = await supabaseAdmin
-        .from('rsvp_responses')
-        .select('*', { count: 'exact', head: true })
-        .eq('card_id', card_id);
-
-      if (countError) {
-        return NextResponse.json({ error: 'Failed to count RSVPs' }, { status: 500 });
-      }
-
-      const limit = planData?.rsvp_limit ?? 100;
-      if (count !== null && count >= limit) {
-        return NextResponse.json({ error: `Gói cơ bản đã đạt giới hạn tối đa ${limit} phản hồi RSVP.` }, { status: 400 });
-      }
+      return NextResponse.json({ error: 'Gói Cơ Bản không hỗ trợ tính năng RSVP.' }, { status: 400 });
     }
 
     // 3. Insert response record

@@ -8,6 +8,7 @@ import { Check, ArrowLeft, Heart, Sparkles, Trophy, Award } from 'lucide-react';
 function PricingContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get('template_id');
+  const isPremiumTemplate = templateId === 'template-14';
 
   if (!templateId) {
     return (
@@ -89,12 +90,18 @@ function PricingContent() {
             </div>
 
             <div className="pt-8">
-              <Link
-                href={`/create?template_id=${templateId}&plan=basic`}
-                className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-center font-bold py-3.5 px-4 rounded-xl transition-all hover:scale-[1.02]"
-              >
-                Chọn Gói Basic
-              </Link>
+              {isPremiumTemplate ? (
+                <div className="text-center p-3 bg-slate-50 border border-slate-200/60 rounded-xl">
+                  <p className="text-xs text-slate-400 font-medium">Mẫu thiệp này không áp dụng cho Gói Cơ Bản</p>
+                </div>
+              ) : (
+                <Link
+                  href={`/create?template_id=${templateId}&plan=basic`}
+                  className="block w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-center font-bold py-3.5 px-4 rounded-xl transition-all hover:scale-[1.02]"
+                >
+                  Chọn Gói Basic
+                </Link>
+              )}
             </div>
           </div>
 

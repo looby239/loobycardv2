@@ -582,37 +582,39 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
         </section>
 
         {/* RSVP Section */}
-        <section className="rsvp" id="rsvp-section">
-          <h2 className="section-gold-title">XÁC NHẬN THAM DỰ</h2>
-          <p className="section-subtitle">Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng tôi</p>
+        {card.plan_id !== 'basic' && (
+          <section className="rsvp" id="rsvp-section">
+            <h2 className="section-gold-title">XÁC NHẬN THAM DỰ</h2>
+            <p className="section-subtitle">Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng tôi</p>
 
-          <form className="rsvp-form" id="rsvp-form" onSubmit={handleRsvpSubmit}>
-            <div className="form-group">
-              <label htmlFor="guest-name">Họ tên khách mời *</label>
-              <input type="text" id="guest-name" placeholder="Nhập tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="guest-status">Bạn sẽ tham gia chứ? *</label>
-              <select id="guest-status" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
-                <option value="yes">Chắc chắn tham dự</option>
-                <option value="no">Rất tiếc không thể đến</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="guest-count">Số người tham dự đi cùng</label>
-              <select id="guest-count" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
-                <option value={0}>Chỉ một mình tôi</option>
-                <option value={1}>1 người đi cùng</option>
-                <option value={2}>2 người đi cùng</option>
-                <option value={3}>3 người đi cùng</option>
-              </select>
-            </div>
-            <button type="submit" className="btn-submit" disabled={rsvpSubmitting}>
-              <span>{rsvpSubmitting ? 'Đang Gửi...' : 'Gửi Xác Nhận'}</span>
-              <div className="btn-shine"></div>
-            </button>
-          </form>
-        </section>
+            <form className="rsvp-form" id="rsvp-form" onSubmit={handleRsvpSubmit}>
+              <div className="form-group">
+                <label htmlFor="guest-name">Họ tên khách mời *</label>
+                <input type="text" id="guest-name" placeholder="Nhập tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="guest-status">Bạn sẽ tham gia chứ? *</label>
+                <select id="guest-status" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
+                  <option value="yes">Chắc chắn tham dự</option>
+                  <option value="no">Rất tiếc không thể đến</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="guest-count">Số người tham dự đi cùng</label>
+                <select id="guest-count" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
+                  <option value={0}>Chỉ một mình tôi</option>
+                  <option value={1}>1 người đi cùng</option>
+                  <option value={2}>2 người đi cùng</option>
+                  <option value={3}>3 người đi cùng</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-submit" disabled={rsvpSubmitting}>
+                <span>{rsvpSubmitting ? 'Đang Gửi...' : 'Gửi Xác Nhận'}</span>
+                <div className="btn-shine"></div>
+              </button>
+            </form>
+          </section>
+        )}
 
         {/* Guestbook Section */}
         {card.plan_id !== 'basic' && (
@@ -667,7 +669,9 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
         {/* Footer */}
         <footer className="wedding-footer">
           <p className="footer-thank">{card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!'}</p>
-          <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link">♡ Loobycard.com</a>
+          {(!card.plan_id || card.plan_id === 'basic') && (
+            <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link">♡ Loobycard.com</a>
+          )}
         </footer>
 
         {/* Bottom decor image */}

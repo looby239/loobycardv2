@@ -159,14 +159,14 @@ export default function AdminCardsPage() {
     let processedFiles: File[] = Array.from(files);
 
     const options = {
-      maxSizeMB: 5,
+      maxSizeMB: 2,
       maxWidthOrHeight: 2048,
       useWebWorker: true,
     };
 
     try {
       const compressedPromises = processedFiles.map(async (file) => {
-        if ((type === 'cover' || type === 'album') && file.size > 5 * 1024 * 1024) {
+        if ((type === 'cover' || type === 'album') && file.size > 2 * 1024 * 1024) {
           return await imageCompression(file, options);
         }
         return file;

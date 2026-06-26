@@ -141,7 +141,6 @@ function CreateWizard() {
   // Submission
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
   // Check inputs
   if (!templateId || !plan || !['basic', 'premium', 'luxury'].includes(plan)) {
     return (
@@ -162,6 +161,26 @@ function CreateWizard() {
     );
   }
 
+  // Check premium template constraints
+  const isPremiumTemplate = templateId === 'template-14';
+  if (isPremiumTemplate && plan === 'basic') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-slate-100 text-center space-y-6">
+          <div className="h-16 w-16 bg-rose-100 rounded-full flex items-center justify-center text-rose-500 mx-auto">
+            <AlertTriangle size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 font-serif">Mẫu Thiệp Hạn Chế</h2>
+          <p className="text-slate-500 text-sm">
+            Mẫu thiệp Premium không thể sử dụng với Gói Cơ Bản. Vui lòng chọn Gói Premium hoặc Luxury.
+          </p>
+          <Link href={`/pricing?template_id=${templateId}`} className="block w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition">
+            Chọn gói cước khác
+          </Link>
+        </div>
+      </div>
+    );
+  }
   // Load draft from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(`looby_draft_${templateId}_${plan}`);
@@ -231,14 +250,14 @@ function CreateWizard() {
 
     if (type === 'cover' || type === 'album') {
       const options = {
-        maxSizeMB: 5,
+        maxSizeMB: 2,
         maxWidthOrHeight: 2048,
         useWebWorker: true,
       };
 
       try {
         const compressedPromises = processedFiles.map(async (file) => {
-          if (file.size > 5 * 1024 * 1024) {
+          if (file.size > 2 * 1024 * 1024) {
             return await imageCompression(file, options);
           }
           return file;
@@ -919,7 +938,7 @@ function CreateWizard() {
                             disabled={uploadingCover}
                           />
                         </label>
-                        <p className="text-slate-400 text-[10px]">Tải lên file PNG, JPG, WEBP. Hệ thống sẽ tự nén nếu ảnh &gt; 5MB.</p>
+                        <p className="text-slate-400 text-[10px]">Tải lên file PNG, JPG, WEBP. Hệ thống sẽ tự nén nếu ảnh &gt; 2MB.</p>
                         {errors.cover && <span className="text-xs text-red-500 font-semibold block">{errors.cover}</span>}
                       </div>
                     </div>

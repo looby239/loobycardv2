@@ -424,33 +424,35 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* RSVP Section */}
-        <section className="rsvp">
-          <h2 className="section-title">Xác Nhận Tham Dự</h2>
-          <p className="section-subtitle">Để gia đình chuẩn bị đón tiếp một cách chu đáo nhất</p>
-          
-          <form className="rsvp-form" id="rsvp-form" onSubmit={handleRsvpSubmit}>
-            <div className="form-group">
-              <label htmlFor="guest-name">Tên của bạn</label>
-              <input type="text" id="guest-name" placeholder="Nhập họ tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="guest-status">Khả năng tham dự</label>
-              <select id="guest-status" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
-                <option value="yes">Chắc chắn tham dự</option>
-                <option value="no">Rất tiếc không thể đến</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="guest-count">Số người tham dự đi cùng</label>
-              <select id="guest-count" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
-                <option value={0}>Đi một mình</option>
-                <option value={1}>1 người đi cùng</option>
-                <option value={2}>2 người đi cùng</option>
-              </select>
-            </div>
-            <button type="submit" className="btn-submit" disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi Phản Hồi RSVP'}</button>
-          </form>
-        </section>
+        {card.plan_id !== 'basic' && (
+          <section className="rsvp">
+            <h2 className="section-title">Xác Nhận Tham Dự</h2>
+            <p className="section-subtitle">Để gia đình chuẩn bị đón tiếp một cách chu đáo nhất</p>
+            
+            <form className="rsvp-form" id="rsvp-form" onSubmit={handleRsvpSubmit}>
+              <div className="form-group">
+                <label htmlFor="guest-name">Tên của bạn</label>
+                <input type="text" id="guest-name" placeholder="Nhập họ tên của bạn" required value={rsvpName} onChange={(e) => setRsvpName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="guest-status">Khả năng tham dự</label>
+                <select id="guest-status" required value={rsvpStatus} onChange={(e) => setRsvpStatus(e.target.value)}>
+                  <option value="yes">Chắc chắn tham dự</option>
+                  <option value="no">Rất tiếc không thể đến</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="guest-count">Số người tham dự đi cùng</label>
+                <select id="guest-count" value={rsvpCount} onChange={(e) => setRsvpCount(Number(e.target.value))}>
+                  <option value={0}>Đi một mình</option>
+                  <option value={1}>1 người đi cùng</option>
+                  <option value={2}>2 người đi cùng</option>
+                </select>
+              </div>
+              <button type="submit" className="btn-submit" disabled={rsvpSubmitting}>{rsvpSubmitting ? 'Đang gửi...' : 'Gửi Phản Hồi RSVP'}</button>
+            </form>
+          </section>
+        )}
 
         {/* Guestbook Section */}
         {card.plan_id !== 'basic' && (
@@ -540,9 +542,49 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
           </section>
         )}
 
+        {/* Footer */}
+        <footer className="wedding-footer" style={{ textAlign: 'center', padding: '3rem 1rem', marginTop: '2rem' }}>
+          <p className="footer-thank" style={{ fontStyle: 'italic', opacity: 0.8, fontSize: '0.9rem', marginBottom: '1rem', color: '#c5a880' }}>
+            {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!'}
+          </p>
+          {(!card.plan_id || card.plan_id === 'basic') && (
+            <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link" style={{ fontSize: '0.8rem', opacity: 0.6, textDecoration: 'none', color: 'inherit', display: 'block', marginTop: '0.5rem' }}>
+              ❦ loobycard.com
+            </a>
+          )}
+        </footer>
+
         {/* Bottom decor image */}
         <img src="/assets/images/template-11/hoa.webp" className="bg-decor-bottom" alt="" />
       </div>
+
+      {/* Music toggle button */}
+      {card.music_url && (
+        <button 
+          className="music-toggle-btn"
+          onClick={toggleMusic}
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '20px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            display: opened ? 'flex' : 'none',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 999,
+            color: '#333',
+          }}
+          title="Bật/Tắt nhạc nền"
+        >
+          <i className={musicPlaying ? "fas fa-volume-up" : "fas fa-volume-mute"}></i>
+        </button>
+      )}
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
       {lightboxImg && (

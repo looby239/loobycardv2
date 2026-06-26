@@ -28,11 +28,11 @@ export default function WeddingSchedule({ schedule, hasSchedule = false }: Weddi
         </p>
       </div>
 
-      <div className="relative border-l border-dashed border-[var(--color-gold,#d4af37)]/50 mx-auto pl-8 pr-4 space-y-8 text-left max-w-md">
+      <div className="relative border-l border-dashed border-[var(--color-gold,#d4af37)]/50 ml-8 mr-4 sm:mx-auto pl-8 pr-4 space-y-8 text-left max-w-md">
         {schedule.map((item, index) => (
           <div key={index} className="relative group transition-all duration-300">
             {/* Circle Node */}
-            <div className="absolute -left-[45px] top-1.5 bg-[var(--bg-primary,#ffffff)] text-[var(--color-gold,var(--color-primary,#e11d48))] w-8 h-8 rounded-full border border-[var(--color-gold,#d4af37)]/70 flex items-center justify-center text-xs font-bold shadow-sm group-hover:scale-110 transition-transform">
+            <div className="absolute left-0 -translate-x-1/2 top-1.5 bg-[var(--bg-primary,#ffffff)] text-[var(--color-gold,var(--color-primary,#e11d48))] w-8 h-8 rounded-full border border-[var(--color-gold,#d4af37)]/70 flex items-center justify-center text-xs font-bold shadow-sm group-hover:scale-110 transition-transform">
               {index + 1}
             </div>
 

@@ -270,44 +270,51 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
         </section>
 
         {/* Album Section */}
-        {albumImages.length > 0 && (
-          <section className="album">
-            <h2 className="section-title">Khoảnh Khắc</h2>
-            <p>Nhìn lại những kỷ niệm ngọt ngào của chúng mình</p>
-            <div style={{ marginTop: '2rem', padding: '0 10px' }}>
-              <Swiper
-                modules={[Pagination, Autoplay]}
-                spaceBetween={15}
-                slidesPerView={albumImages.length > 1 ? 1.5 : 1}
-                centeredSlides={albumImages.length > 1}
-                loop={albumImages.length >= 3}
-                pagination={{ clickable: true }}
-                autoplay={albumImages.length > 1 ? { delay: 3000, disableOnInteraction: false } : false}
-                className="album-swiper"
-              >
-                {albumImages.map((imgUrl, i) => (
-                  <SwiperSlide key={i}>
-                    <div style={{ paddingBottom: '30px' }}>
-                      <img 
-                        src={imgUrl} 
-                        alt={`Gallery image ${i + 1}`} 
-                        onClick={() => setLightboxImg(imgUrl)} 
-                        style={{ 
-                          cursor: 'pointer', 
-                          width: '100%', 
-                          height: '350px', 
-                          objectFit: 'cover', 
-                          borderRadius: '15px',
-                          boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                        }} 
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          </section>
-        )}
+        {albumImages.length > 0 && (() => {
+          // Swiper loop requires >= 3 slides. Duplicate if 2 images to enable loop+autoplay.
+          const swiperImages = albumImages.length === 2
+            ? [...albumImages, ...albumImages]
+            : albumImages;
+          const hasMultiple = swiperImages.length > 1;
+          return (
+            <section className="album">
+              <h2 className="section-title">Khoảnh Khắc</h2>
+              <p>Nhìn lại những kỷ niệm ngọt ngào của chúng mình</p>
+              <div style={{ marginTop: '2rem', padding: '0 10px' }}>
+                <Swiper
+                  modules={[Pagination, Autoplay]}
+                  spaceBetween={15}
+                  slidesPerView={hasMultiple ? 1.5 : 1}
+                  centeredSlides={hasMultiple}
+                  loop={hasMultiple}
+                  pagination={{ clickable: true }}
+                  autoplay={hasMultiple ? { delay: 3000, disableOnInteraction: false } : false}
+                  className="album-swiper"
+                >
+                  {swiperImages.map((imgUrl, i) => (
+                    <SwiperSlide key={i}>
+                      <div style={{ paddingBottom: '30px' }}>
+                        <img
+                          src={imgUrl}
+                          alt={`Gallery image ${(i % albumImages.length) + 1}`}
+                          onClick={() => setLightboxImg(imgUrl)}
+                          style={{
+                            cursor: 'pointer',
+                            width: '100%',
+                            height: '350px',
+                            objectFit: 'cover',
+                            borderRadius: '15px',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                          }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Event Details Section */}
         <section className="events">

@@ -24,6 +24,28 @@ interface TemplateResolverProps {
   templateKey?: string;
 }
 
+function PlanRuleStyles() {
+  return (
+    <style>{`
+      .template-plan-basic [class*="quote"],
+      .template-plan-basic [class*="rsvp"],
+      .template-plan-basic [class*="guestbook"],
+      .template-plan-basic [id*="rsvp"],
+      .template-plan-basic [id*="wishes"],
+      .template-plan-basic a[href*="rsvp"] {
+        display: none !important;
+      }
+
+      .template-plan-premium .footer-link,
+      .template-plan-luxury .footer-link,
+      .template-plan-premium a[href*="loobycard.com"],
+      .template-plan-luxury a[href*="loobycard.com"] {
+        display: none !important;
+      }
+    `}</style>
+  );
+}
+
 function ConfiguredTemplateShell({
   config,
   children,
@@ -263,6 +285,7 @@ function ConfiguredTemplateShell({
 
 export default function TemplateResolver({ card, previewMode = false, cssOverride, templateConfig, templateKey }: TemplateResolverProps) {
   const templateId = templateKey || card.template_id || 'template-10';
+  const planClass = `template-plan-${card.plan_id || 'basic'}`;
 
   const renderedTemplate = (() => {
     switch (templateId) {
@@ -293,15 +316,18 @@ export default function TemplateResolver({ card, previewMode = false, cssOverrid
 
   return (
     <>
+      <PlanRuleStyles />
       {/* Inject admin CSS overrides as a scoped <style> block */}
       {cssOverride && cssOverride.trim() && (
         <style dangerouslySetInnerHTML={{ __html: cssOverride }} />
       )}
-      {templateConfig ? (
-        <ConfiguredTemplateShell config={templateConfig}>
-          {renderedTemplate}
-        </ConfiguredTemplateShell>
-      ) : renderedTemplate}
+      <div className={`template-plan-rules ${planClass}`}>
+        {templateConfig ? (
+          <ConfiguredTemplateShell config={templateConfig}>
+            {renderedTemplate}
+          </ConfiguredTemplateShell>
+        ) : renderedTemplate}
+      </div>
     </>
   );
 }

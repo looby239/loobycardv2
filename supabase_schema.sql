@@ -32,8 +32,20 @@ CREATE TABLE IF NOT EXISTS templates (
   thumbnail_url TEXT NOT NULL,
   preview_url TEXT NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  base_template_id TEXT REFERENCES templates(id),
+  base_template_key TEXT,
+  config JSONB DEFAULT '{}'::jsonb,
+  is_customizable BOOLEAN DEFAULT FALSE,
+  is_custom_template BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE templates
+  ADD COLUMN IF NOT EXISTS base_template_id TEXT REFERENCES templates(id),
+  ADD COLUMN IF NOT EXISTS base_template_key TEXT,
+  ADD COLUMN IF NOT EXISTS config JSONB DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS is_customizable BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS is_custom_template BOOLEAN DEFAULT FALSE;
 
 -- Insert templates 10 through 19
 INSERT INTO templates (id, name, type, thumbnail_url, preview_url, is_active)
@@ -200,20 +212,38 @@ CREATE TABLE IF NOT EXISTS template_configs (
   id TEXT PRIMARY KEY,                   -- 'template-10' ... 'template-19'
   name TEXT NOT NULL DEFAULT '',
   description TEXT DEFAULT '',
+  type TEXT DEFAULT 'thiep-cuoi',
   thumbnail_url TEXT,                    -- Custom uploaded thumbnail URL
+  preview_url TEXT,
   is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
   css_override TEXT NOT NULL DEFAULT '', -- Admin CSS injected into live render
   sample_data JSONB NOT NULL DEFAULT '{}'::jsonb, -- Editable sample invitation data for template preview
+  base_template_id TEXT,
+  base_template_key TEXT,
+  config JSONB NOT NULL DEFAULT '{}'::jsonb,
+  is_customizable BOOLEAN NOT NULL DEFAULT TRUE,
+  is_custom_template BOOLEAN NOT NULL DEFAULT FALSE,
   sort_order INTEGER NOT NULL DEFAULT 0,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 ALTER TABLE template_configs
-  ADD COLUMN IF NOT EXISTS sample_data JSONB NOT NULL DEFAULT '{}'::jsonb;
+  ADD COLUMN IF NOT EXISTS sample_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'thiep-cuoi',
+  ADD COLUMN IF NOT EXISTS preview_url TEXT,
+  ADD COLUMN IF NOT EXISTS base_template_id TEXT,
+  ADD COLUMN IF NOT EXISTS base_template_key TEXT,
+  ADD COLUMN IF NOT EXISTS config JSONB NOT NULL DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS is_customizable BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS is_custom_template BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE template_configs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow service role full access on template_configs"
   ON template_configs FOR ALL USING (true) WITH CHECK (true);
 
--- NOTE: Also create a Storage bucket named "template-thumbnails"
+-- NOTE: Also create Storage buckets named "template-thumbnails" and "template-assets"
 -- with Public access enabled via Supabase dashboard > Storage.
+-- template-assets paths:
+-- template-assets/[template_id]/background/
+-- template-assets/[template_id]/decorations/
+-- template-assets/[template_id]/thumbnail/

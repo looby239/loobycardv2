@@ -100,22 +100,29 @@ export default async function DomainPage({ params }: PageProps) {
     map_url: expandedMapUrl,
   };
 
-  // Fetch CSS override for this template from admin config
+  // Fetch render config for this template from admin config
   let cssOverride = '';
+  let templateKey = cardData.template_id || 'template-10';
+  let customTemplateConfig = undefined;
   try {
     const templateId = card.template_id || 'template-10';
-    const { data: templateConfig } = await supabaseAdmin
+    const { data: templateConfigRow } = await supabaseAdmin
       .from('template_configs')
-      .select('css_override')
+      .select('css_override, config, base_template_key, is_custom_template')
       .eq('id', templateId)
       .maybeSingle();
-    if (templateConfig?.css_override) {
-      cssOverride = templateConfig.css_override;
+    if (templateConfigRow?.css_override) {
+      cssOverride = templateConfigRow.css_override;
+    }
+    if (templateConfigRow?.base_template_key) {
+      templateKey = templateConfigRow.base_template_key;
+    }
+    if (templateConfigRow?.is_custom_template && templateConfigRow.config) {
+      customTemplateConfig = templateConfigRow.config;
     }
   } catch (e) {
-    console.warn('Could not fetch template css_override:', e);
+    console.warn('Could not fetch template config:', e);
   }
 
-  return <TemplateResolver card={cardData} previewMode={false} cssOverride={cssOverride} />;
+  return <TemplateResolver card={cardData} previewMode={false} cssOverride={cssOverride} templateKey={templateKey} templateConfig={customTemplateConfig} />;
 }
-

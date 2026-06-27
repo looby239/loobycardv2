@@ -7,6 +7,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Copy,
   CreditCard,
   Eye,
   FileText,
@@ -17,6 +18,8 @@ import {
   Loader2,
   MapPin,
   Music,
+  Pencil,
+  Plus,
   RefreshCw,
   Save,
   Settings,
@@ -31,13 +34,21 @@ interface TemplateConfig {
   id: string;
   name: string;
   description: string;
+  type?: string;
+  typeName?: string;
   thumbnail_url: string | null;
   defaultThumbnail: string;
+  preview_url?: string | null;
   is_enabled: boolean;
   css_override?: string;
   sample_data?: Partial<CardData> | null;
   sort_order: number;
   updated_at: string;
+  base_template_id?: string | null;
+  base_template_key?: string | null;
+  config?: unknown;
+  is_custom_template?: boolean;
+  is_customizable?: boolean;
 }
 
 type AdminTab = 'overview' | 'thumbnails' | 'sample';
@@ -315,6 +326,32 @@ export default function AdminTemplatesPage() {
       showToast('Đã xóa thumbnail, hiển thị ảnh mặc định');
     } catch {
       showToast('Không thể xóa thumbnail', 'error');
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const duplicateTemplate = async (template: TemplateConfig) => {
+    setSaving(template.id);
+    try {
+      const res = await fetch('/api/admin/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'duplicate',
+          base_template_id: template.id,
+          name: `${template.name} copy`,
+          thumbnail_url: template.thumbnail_url || template.defaultThumbnail || '',
+          is_enabled: false,
+          config: template.config || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Khong the duplicate template');
+      showToast('Da duplicate template');
+      await fetchTemplates();
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Khong the duplicate template', 'error');
     } finally {
       setSaving(null);
     }
@@ -666,8 +703,14 @@ export default function AdminTemplatesPage() {
         </div>
 
         <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 12px', lineHeight: 1.5 }}>{tmpl.description}</p>
+        <div style={{ display: 'grid', gap: 5, marginBottom: 12, padding: 10, borderRadius: 10, background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: 11, color: '#64748b' }}>Loại: <strong style={{ color: '#334155' }}>{tmpl.typeName || tmpl.type || 'Thiệp cưới'}</strong></span>
+          <span style={{ fontSize: 11, color: '#64748b' }}>
+            Base: <strong style={{ color: '#334155' }}>{tmpl.base_template_key || tmpl.base_template_id || (tmpl.is_custom_template ? 'Custom' : 'Template gốc')}</strong>
+          </span>
+        </div>
 
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: 4 }}>
             <button type="button" onClick={() => moveSortOrder(tmpl.id, 'up')} disabled={idx === 0} title="Di chuyển lên" style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #e2e8f0', background: '#f8fafc', cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.4 : 1 }}>
               <ChevronUp size={14} color="#475569" />
@@ -676,6 +719,33 @@ export default function AdminTemplatesPage() {
               <ChevronDown size={14} color="#475569" />
             </button>
           </div>
+          <a
+            href={tmpl.preview_url || `/template-preview/${tmpl.id}`}
+            target="_blank"
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 9px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}
+          >
+            <Eye size={12} /> Preview
+          </a>
+          <Link
+            href={`/admin/templates/${tmpl.id}/edit`}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 9px', borderRadius: 8, border: '1px solid #c7d2fe', background: '#eef2ff', color: '#4f46e5', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}
+          >
+            <Pencil size={12} /> Chỉnh sửa
+          </Link>
+          <button
+            type="button"
+            onClick={() => void duplicateTemplate(tmpl)}
+            disabled={saving === tmpl.id}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 9px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: 11, fontWeight: 800, cursor: saving === tmpl.id ? 'wait' : 'pointer' }}
+          >
+            <Copy size={12} /> Duplicate
+          </button>
+          <Link
+            href={`/admin/templates/new?base_template_id=${encodeURIComponent(tmpl.id)}`}
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 9px', borderRadius: 8, border: '1px solid #bbf7d0', background: '#f0fdf4', color: '#15803d', fontSize: 11, fontWeight: 800, textDecoration: 'none' }}
+          >
+            <Plus size={12} /> Tạo template từ mẫu này
+          </Link>
           <button
             type="button"
             onClick={() => {

@@ -13,20 +13,20 @@ export async function POST(request: Request) {
 
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeExt = ext.replace(/[^a-z0-9]/g, '') || 'jpg';
-    const fileName = `${templateId}/thumbnail-${Date.now()}.${safeExt}`;
+    const fileName = `${templateId}/thumbnail/thumbnail-${Date.now()}.${safeExt}`;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     // Ensure bucket exists
     try {
-      await supabaseAdmin.storage.createBucket('template-thumbnails', { public: true });
+      await supabaseAdmin.storage.createBucket('template-assets', { public: true });
     } catch {
       // Ignore error if bucket already exists
     }
 
     // Upload to Supabase storage
     const { error: uploadError } = await supabaseAdmin.storage
-      .from('template-thumbnails')
+      .from('template-assets')
       .upload(fileName, buffer, {
         contentType: file.type || 'image/jpeg',
         cacheControl: '3600',
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     // Get public URL
     const { data: urlData } = supabaseAdmin.storage
-      .from('template-thumbnails')
+      .from('template-assets')
       .getPublicUrl(fileName);
 
     const publicUrl = urlData.publicUrl;
@@ -51,6 +51,15 @@ export async function POST(request: Request) {
       .eq('id', templateId);
 
     if (updateError) throw updateError;
+
+    try {
+      await supabaseAdmin
+        .from('templates')
+        .update({ thumbnail_url: publicUrl })
+        .eq('id', templateId);
+    } catch {
+      // templates mirror table may not be migrated yet.
+    }
 
     return NextResponse.json({ success: true, url: publicUrl, updated_at: updatedAt });
   } catch (error: unknown) {

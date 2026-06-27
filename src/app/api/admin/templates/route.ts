@@ -1,48 +1,65 @@
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
 import { CardData } from '@/types/card';
+import { TEMPLATE_CATALOG, getTemplateCatalogItem } from '@/lib/templateCatalog';
+import {
+  DEFAULT_TEMPLATE_CONFIG,
+  createTemplateSchema,
+  normalizeTemplateConfig,
+  templateUpsertSchema,
+  type TemplateConfig,
+} from '@/lib/templateConfig';
 
 interface TemplateConfigRow {
   id: string;
   name: string;
   description: string | null;
+  type?: string | null;
   thumbnail_url: string | null;
+  preview_url?: string | null;
   is_enabled: boolean;
   css_override: string;
   sample_data?: Partial<CardData> | null;
   sort_order: number;
   updated_at?: string | null;
+  base_template_id?: string | null;
+  base_template_key?: string | null;
+  config?: TemplateConfig | null;
+  is_customizable?: boolean | null;
+  is_custom_template?: boolean | null;
 }
 
-interface TemplatePatchBody {
-  id?: string;
-  is_enabled?: boolean;
-  thumbnail_url?: string | null;
-  css_override?: string;
-  sample_data?: Partial<CardData>;
-  name?: string;
-  description?: string;
-  sort_order?: number;
+function nowIso() {
+  return new Date().toISOString();
 }
 
-// Static template metadata (source of truth for names/descriptions)
-const TEMPLATE_META: Record<string, { name: string; description: string; defaultThumbnail: string }> = {
-  'template-10': { name: 'Lời Hứa Vĩnh Cửu', description: 'Phong cách Á Đông truyền thống, màu đỏ son và vàng rực rỡ', defaultThumbnail: '/templates/template-10/assets/images/cover_photo.png' },
-  'template-11': { name: 'Hoa Anh Đào', description: 'Nhẹ nhàng, lãng mạn với sắc hồng anh đào', defaultThumbnail: '' },
-  'template-12': { name: 'Hoàng Hôn Vàng', description: 'Sang trọng với tông vàng kem và trắng tinh', defaultThumbnail: '' },
-  'template-13': { name: 'Bảo Ngọc', description: 'Quý phái với tông xanh ngọc và vàng ánh kim', defaultThumbnail: '' },
-  'template-14': { name: 'Lá Mùa Thu', description: 'Ấm áp với tông nâu đất và vàng lá thu', defaultThumbnail: '' },
-  'template-15': { name: 'Hương Thơm Đồng Nội', description: 'Tươi mát với sắc xanh lá và trắng tinh khôi', defaultThumbnail: '' },
-  'template-16': { name: 'Bình Minh Mới', description: 'Hiện đại với gradient tím hồng', defaultThumbnail: '' },
-  'template-17': { name: 'Đêm Sao', description: 'Huyền bí với nền tối và điểm sao lấp lánh', defaultThumbnail: '' },
-  'template-18': { name: 'Mùa Xuân', description: 'Tươi vui với sắc hồng phấn và xanh lá', defaultThumbnail: '' },
-  'template-19': { name: 'Thiên Đường', description: 'Bay bổng với sắc trắng và lavender nhẹ nhàng', defaultThumbnail: '' },
-};
+function getRenderKey(row: Partial<TemplateConfigRow>) {
+  return row.base_template_key || row.id || 'template-10';
+}
 
-// Ensure template_configs table has rows for all templates (upsert defaults)
+function getPreviewUrl(templateId: string) {
+  return `/template-preview/${templateId}`;
+}
+
+function enrichTemplate(row: TemplateConfigRow) {
+  const catalog = getTemplateCatalogItem(row.base_template_key || row.id);
+  return {
+    ...row,
+    type: row.type || catalog?.type || 'thiep-cuoi',
+    typeName: catalog?.typeName || 'Thiep cuoi',
+    preview_url: row.preview_url || getPreviewUrl(row.id),
+    defaultThumbnail: catalog?.defaultThumbnail || row.thumbnail_url || '',
+    base_template_key: row.base_template_key || catalog?.key || row.id,
+    config: normalizeTemplateConfig(row.config),
+    is_customizable: row.is_customizable ?? true,
+    is_custom_template: row.is_custom_template ?? false,
+  };
+}
+
 async function ensureTemplateRows() {
-  const entries = Object.entries(TEMPLATE_META).map(([id, meta], i) => ({
-    id,
+  const entries = TEMPLATE_CATALOG.map((meta, i) => ({
+    id: meta.id,
     name: meta.name,
     description: meta.description,
     thumbnail_url: meta.defaultThumbnail || null,
@@ -60,6 +77,38 @@ async function ensureTemplateRows() {
   }
 }
 
+async function mirrorTemplateRow(row: {
+  id: string;
+  name: string;
+  type: string;
+  thumbnail_url: string | null;
+  preview_url: string;
+  is_enabled: boolean;
+  base_template_id?: string | null;
+  base_template_key?: string | null;
+  config?: TemplateConfig;
+  is_customizable?: boolean;
+  is_custom_template?: boolean;
+}) {
+  try {
+    await supabaseAdmin.from('templates').upsert({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      thumbnail_url: row.thumbnail_url || '',
+      preview_url: row.preview_url,
+      is_active: row.is_enabled,
+      base_template_id: row.base_template_id || null,
+      base_template_key: row.base_template_key || row.id,
+      config: row.config || DEFAULT_TEMPLATE_CONFIG,
+      is_customizable: row.is_customizable ?? true,
+      is_custom_template: row.is_custom_template ?? false,
+    }, { onConflict: 'id' });
+  } catch (error) {
+    console.warn('Could not mirror template_configs row into templates table:', error);
+  }
+}
+
 export async function GET() {
   try {
     await ensureTemplateRows();
@@ -71,13 +120,8 @@ export async function GET() {
 
     if (error) throw error;
 
-    // Merge static meta with DB data
-    const enriched = ((data || []) as TemplateConfigRow[]).map((row) => ({
-      ...row,
-      defaultThumbnail: TEMPLATE_META[row.id]?.defaultThumbnail || '',
-    }));
-
-    return NextResponse.json({ success: true, templates: enriched });
+    const templates = ((data || []) as TemplateConfigRow[]).map(enrichTemplate);
+    return NextResponse.json({ success: true, templates });
   } catch (error: unknown) {
     console.error('GET /api/admin/templates error:', error);
     const message = error instanceof Error ? error.message : 'Server error';
@@ -85,34 +129,151 @@ export async function GET() {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    await ensureTemplateRows();
+
+    const body = createTemplateSchema.parse(await request.json());
+    const { data: baseData, error: baseError } = await supabaseAdmin
+      .from('template_configs')
+      .select('*')
+      .eq('id', body.base_template_id)
+      .maybeSingle();
+
+    if (baseError) throw baseError;
+    if (!baseData) {
+      return NextResponse.json({ error: 'Base template not found' }, { status: 404 });
+    }
+
+    const base = enrichTemplate(baseData as TemplateConfigRow);
+    const { count } = await supabaseAdmin
+      .from('template_configs')
+      .select('id', { count: 'exact', head: true });
+
+    const id = body.id || `custom-${randomUUID()}`;
+    const baseTemplateKey = getRenderKey(base);
+    const config = normalizeTemplateConfig(body.config || base.config);
+    const createdAt = nowIso();
+    const thumbnailUrl = body.thumbnail_url || base.thumbnail_url || base.defaultThumbnail || null;
+    const row = {
+      id,
+      name: body.name,
+      description: base.description || '',
+      type: base.type || 'thiep-cuoi',
+      thumbnail_url: thumbnailUrl,
+      preview_url: getPreviewUrl(id),
+      is_enabled: body.is_enabled,
+      css_override: base.css_override || '',
+      sample_data: base.sample_data || {},
+      sort_order: typeof count === 'number' ? count : 999,
+      updated_at: createdAt,
+      base_template_id: base.id,
+      base_template_key: baseTemplateKey,
+      config,
+      is_customizable: true,
+      is_custom_template: true,
+    };
+
+    const { data: inserted, error: insertError } = await supabaseAdmin
+      .from('template_configs')
+      .insert(row)
+      .select('*')
+      .single();
+
+    if (insertError) throw insertError;
+
+    await mirrorTemplateRow(row);
+
+    return NextResponse.json({ success: true, template: enrichTemplate(inserted as TemplateConfigRow) });
+  } catch (error: unknown) {
+    console.error('POST /api/admin/templates error:', error);
+    const message = error instanceof Error ? error.message : 'Server error';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 export async function PATCH(request: Request) {
   try {
-    const body = (await request.json()) as TemplatePatchBody;
-    const { id, is_enabled, thumbnail_url, css_override, sample_data, name, description, sort_order } = body;
+    const parsed = templateUpsertSchema.parse(await request.json());
+    const { id, ...patch } = parsed;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing template id' }, { status: 400 });
     }
 
-    const updateData: Partial<TemplateConfigRow> = { updated_at: new Date().toISOString() };
-    if (is_enabled !== undefined) updateData.is_enabled = is_enabled;
-    if (thumbnail_url !== undefined) updateData.thumbnail_url = thumbnail_url;
-    if (css_override !== undefined) updateData.css_override = css_override;
-    if (sample_data !== undefined) updateData.sample_data = sample_data;
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
-    if (sort_order !== undefined) updateData.sort_order = sort_order;
+    const updateData: Record<string, unknown> = { updated_at: nowIso() };
+    for (const [key, value] of Object.entries(patch)) {
+      if (value !== undefined) {
+        updateData[key] = key === 'config' ? normalizeTemplateConfig(value) : value;
+      }
+    }
 
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('template_configs')
       .update(updateData)
-      .eq('id', id);
+      .eq('id', id)
+      .select('*')
+      .single();
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true });
+    const enriched = enrichTemplate(data as TemplateConfigRow);
+    await mirrorTemplateRow({
+      id: enriched.id,
+      name: enriched.name,
+      type: enriched.type,
+      thumbnail_url: enriched.thumbnail_url,
+      preview_url: enriched.preview_url,
+      is_enabled: enriched.is_enabled,
+      base_template_id: enriched.base_template_id,
+      base_template_key: enriched.base_template_key,
+      config: enriched.config,
+      is_customizable: enriched.is_customizable,
+      is_custom_template: enriched.is_custom_template,
+    });
+
+    return NextResponse.json({ success: true, template: enriched });
   } catch (error: unknown) {
     console.error('PATCH /api/admin/templates error:', error);
+    const message = error instanceof Error ? error.message : 'Server error';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing template id' }, { status: 400 });
+    }
+
+    const [{ count: cardCount }, { count: childCount }] = await Promise.all([
+      supabaseAdmin.from('cards').select('id', { count: 'exact', head: true }).eq('template_id', id),
+      supabaseAdmin.from('template_configs').select('id', { count: 'exact', head: true }).eq('base_template_id', id),
+    ]);
+
+    if ((cardCount || 0) > 0) {
+      return NextResponse.json({ error: 'Cannot delete a template that is used by cards' }, { status: 409 });
+    }
+
+    if ((childCount || 0) > 0) {
+      return NextResponse.json({ error: 'Cannot delete a template that has custom templates' }, { status: 409 });
+    }
+
+    const { error } = await supabaseAdmin.from('template_configs').delete().eq('id', id);
+    if (error) throw error;
+
+    try {
+      await supabaseAdmin.from('templates').delete().eq('id', id);
+    } catch (error) {
+      console.warn('Could not delete mirrored templates row:', error);
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: unknown) {
+    console.error('DELETE /api/admin/templates error:', error);
     const message = error instanceof Error ? error.message : 'Server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }

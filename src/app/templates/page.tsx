@@ -31,7 +31,11 @@ interface Template {
 interface AdminTemplateConfig {
   id: string;
   name?: string | null;
+  typeName?: string | null;
+  type?: string | null;
   thumbnail_url?: string | null;
+  defaultThumbnail?: string | null;
+  preview_url?: string | null;
   is_enabled: boolean;
   sort_order: number;
 }
@@ -63,14 +67,18 @@ export default function TemplatesPage() {
             .filter(t => t.is_enabled)
             .sort((a, b) => a.sort_order - b.sort_order)
             .map(t => {
-              const meta = TEMPLATE_STATIC[t.id] || { thumbnail: '', previewUrl: '#', typeName: 'Thiệp cưới' };
+              const meta = TEMPLATE_STATIC[t.id] || {
+                thumbnail: t.defaultThumbnail || '',
+                previewUrl: t.preview_url || `/template-preview/${t.id}`,
+                typeName: t.typeName || 'Thiệp cưới',
+              };
               return {
                 id: t.id,
                 name: t.name || meta.typeName,
-                typeName: meta.typeName,
+                typeName: t.typeName || meta.typeName,
                 // Use admin-uploaded thumbnail if available, otherwise static fallback
-                thumbnail: t.thumbnail_url || meta.thumbnail,
-                previewUrl: meta.previewUrl,
+                thumbnail: t.thumbnail_url || t.defaultThumbnail || meta.thumbnail,
+                previewUrl: t.preview_url || meta.previewUrl,
               };
             });
           if (enabled.length > 0) setTemplates(enabled);

@@ -657,11 +657,9 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
           <p className="footer-thank text-center italic font-serif text-slate-500 text-sm mx-auto px-4">
             {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh lớn cho hai bên gia đình chúng tôi!'}
           </p>
-          {(!card.plan_id || card.plan_id === 'basic') && (
             <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link text-[10px] text-slate-400 hover:text-[#8a5a2a] block mt-6 font-semibold">
               ❦ loobycard.com
             </a>
-          )}
         </footer>
 
         <img src="/assets/images/template-15/hoa.webp" className="bg-decor-bottom" alt="" />

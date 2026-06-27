@@ -8,16 +8,16 @@ import 'swiper/css';
 
 // Fallback static metadata (thumbnail & previewUrl are static, not from DB)
 const TEMPLATE_STATIC: Record<string, { thumbnail: string; previewUrl: string; typeName: string }> = {
-  'template-10': { thumbnail: '/assets/images/template-10-thumbnail.png', previewUrl: '/loc-thu', typeName: 'Thiệp cưới' },
-  'template-11': { thumbnail: '/assets/images/template-11-thumbnail.png', previewUrl: '/template11', typeName: 'Thiệp cưới' },
-  'template-12': { thumbnail: '/assets/images/template-12/preview.png', previewUrl: '/templates/template-12/index.html', typeName: 'Thiệp cưới' },
-  'template-13': { thumbnail: '/assets/images/template-13/preview.png', previewUrl: '/templates/template-13/index.html', typeName: 'Thiệp cưới' },
-  'template-14': { thumbnail: '/assets/images/template-14/preview.png', previewUrl: '/templates/template-14/index.html', typeName: 'Thiệp cưới' },
-  'template-15': { thumbnail: '/assets/images/template-15/preview.png', previewUrl: '/templates/template-15/index.html', typeName: 'Thiệp cưới' },
-  'template-16': { thumbnail: '/assets/images/template-16/preview.png', previewUrl: '/templates/template-16/index.html', typeName: 'Thiệp cưới' },
-  'template-17': { thumbnail: '/assets/images/template-17/photo1.jpg', previewUrl: '/templates/template-17/index.html', typeName: 'Thiệp cưới' },
-  'template-18': { thumbnail: '/assets/images/template-18/photo1.jpg', previewUrl: '/templates/template-18/index.html', typeName: 'Thiệp cưới' },
-  'template-19': { thumbnail: '/assets/images/template-19/photo1.jpg', previewUrl: '/templates/template-19/index.html', typeName: 'Thiệp cưới' },
+  'template-10': { thumbnail: '/assets/images/template-10-thumbnail.png', previewUrl: '/template-preview/template-10', typeName: 'Thiệp cưới' },
+  'template-11': { thumbnail: '/assets/images/template-11-thumbnail.png', previewUrl: '/template-preview/template-11', typeName: 'Thiệp cưới' },
+  'template-12': { thumbnail: '/assets/images/template-12/preview.png', previewUrl: '/template-preview/template-12', typeName: 'Thiệp cưới' },
+  'template-13': { thumbnail: '/assets/images/template-13/preview.png', previewUrl: '/template-preview/template-13', typeName: 'Thiệp cưới' },
+  'template-14': { thumbnail: '/assets/images/template-14/preview.png', previewUrl: '/template-preview/template-14', typeName: 'Thiệp cưới' },
+  'template-15': { thumbnail: '/assets/images/template-15/preview.png', previewUrl: '/template-preview/template-15', typeName: 'Thiệp cưới' },
+  'template-16': { thumbnail: '/assets/images/template-16/preview.png', previewUrl: '/template-preview/template-16', typeName: 'Thiệp cưới' },
+  'template-17': { thumbnail: '/assets/images/template-17/photo1.jpg', previewUrl: '/template-preview/template-17', typeName: 'Thiệp cưới' },
+  'template-18': { thumbnail: '/assets/images/template-18/photo1.jpg', previewUrl: '/template-preview/template-18', typeName: 'Thiệp cưới' },
+  'template-19': { thumbnail: '/assets/images/template-19/photo1.jpg', previewUrl: '/template-preview/template-19', typeName: 'Thiệp cưới' },
 };
 
 interface Template {
@@ -26,6 +26,14 @@ interface Template {
   typeName: string;
   thumbnail: string;
   previewUrl: string;
+}
+
+interface AdminTemplateConfig {
+  id: string;
+  name?: string | null;
+  thumbnail_url?: string | null;
+  is_enabled: boolean;
+  sort_order: number;
 }
 
 // Fallback list (used before DB loads or if DB fails)
@@ -41,6 +49,9 @@ export default function TemplatesPage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const resumeAutoScrollRef = useRef<NodeJS.Timeout | null>(null);
+  const iframeCleanupRef = useRef<(() => void) | null>(null);
+  const userInteractingRef = useRef(false);
 
   // Load enabled templates from admin config (sorted by sort_order)
   useEffect(() => {
@@ -48,7 +59,7 @@ export default function TemplatesPage() {
       .then(r => r.json())
       .then(data => {
         if (data.success && data.templates?.length > 0) {
-          const enabled = (data.templates as any[])
+          const enabled = (data.templates as AdminTemplateConfig[])
             .filter(t => t.is_enabled)
             .sort((a, b) => a.sort_order - b.sort_order)
             .map(t => {
@@ -71,55 +82,157 @@ export default function TemplatesPage() {
 
   const activeTemplate = templates[activeIdx] || templates[0];
 
-  const startAutoScroll = () => {
-    if (scrollIntervalRef.current) {
-      clearInterval(scrollIntervalRef.current);
-      scrollIntervalRef.current = null;
+  const clearResumeAutoScroll = () => {
+    if (resumeAutoScrollRef.current) {
+      clearTimeout(resumeAutoScrollRef.current);
+      resumeAutoScrollRef.current = null;
     }
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    let isScrollingDown = true;
-    scrollIntervalRef.current = setInterval(() => {
-      try {
-        const win = iframe.contentWindow;
-        const doc = iframe.contentDocument || win?.document;
-        if (!win || !doc) return;
-        const currentScroll = doc.documentElement.scrollTop || doc.body.scrollTop;
-        const maxScroll = doc.documentElement.scrollHeight - doc.documentElement.clientHeight;
-        if (maxScroll <= 0) return;
-        if (isScrollingDown) {
-          win.scrollBy(0, 1);
-          if (currentScroll >= maxScroll - 2) isScrollingDown = false;
-        } else {
-          win.scrollTo(0, 0);
-          isScrollingDown = true;
-        }
-      } catch (err) {}
-    }, 40);
+  };
+
+  const cleanupIframeInteractionHandlers = () => {
+    iframeCleanupRef.current?.();
+    iframeCleanupRef.current = null;
   };
 
   const stopAutoScroll = () => {
     if (scrollIntervalRef.current) {
-      clearInterval(scrollIntervalRef.current);
+      clearTimeout(scrollIntervalRef.current);
       scrollIntervalRef.current = null;
     }
+  };
+
+  const startAutoScroll = (delay = 600) => {
+    stopAutoScroll();
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const tick = () => {
+      if (userInteractingRef.current) return;
+
+      try {
+        const win = iframe.contentWindow;
+        const doc = iframe.contentDocument || win?.document;
+        if (!win || !doc) {
+          scrollIntervalRef.current = setTimeout(tick, 250);
+          return;
+        }
+
+        const currentScroll = doc.documentElement.scrollTop || doc.body.scrollTop;
+        const maxScroll = doc.documentElement.scrollHeight - doc.documentElement.clientHeight;
+
+        if (maxScroll <= 0) {
+          scrollIntervalRef.current = setTimeout(tick, 500);
+          return;
+        }
+
+        if (currentScroll >= maxScroll - 2) {
+          scrollIntervalRef.current = setTimeout(() => {
+            win.scrollTo(0, 0);
+            scrollIntervalRef.current = setTimeout(tick, 900);
+          }, 800);
+          return;
+        }
+
+        win.scrollBy(0, 1);
+        scrollIntervalRef.current = setTimeout(tick, 40);
+      } catch {
+        scrollIntervalRef.current = setTimeout(tick, 500);
+      }
+    };
+
+    scrollIntervalRef.current = setTimeout(tick, delay);
+  };
+
+  const pauseAutoScrollForUser = () => {
+    userInteractingRef.current = true;
+    stopAutoScroll();
+    clearResumeAutoScroll();
+  };
+
+  const resumeAutoScrollAfterUserStops = (delay = 900) => {
+    clearResumeAutoScroll();
+    resumeAutoScrollRef.current = setTimeout(() => {
+      userInteractingRef.current = false;
+      startAutoScroll(0);
+    }, delay);
+  };
+
+  const attachIframeInteractionHandlers = () => {
+    cleanupIframeInteractionHandlers();
+
+    const iframe = iframeRef.current;
+    const win = iframe?.contentWindow;
+    const doc = iframe?.contentDocument || win?.document;
+    if (!win || !doc) return;
+
+    try {
+      doc.documentElement.style.setProperty('-webkit-overflow-scrolling', 'touch');
+      doc.body?.style.setProperty('-webkit-overflow-scrolling', 'touch');
+      doc.documentElement.style.setProperty('touch-action', 'pan-y');
+      doc.body?.style.setProperty('touch-action', 'pan-y');
+    } catch {}
+
+    const startUserGesture = () => pauseAutoScrollForUser();
+    const finishUserGesture = () => resumeAutoScrollAfterUserStops();
+    const continueUserGesture = () => {
+      pauseAutoScrollForUser();
+      resumeAutoScrollAfterUserStops(1100);
+    };
+
+    const options: AddEventListenerOptions = { passive: true };
+    doc.addEventListener('wheel', continueUserGesture, options);
+    doc.addEventListener('touchstart', startUserGesture, options);
+    doc.addEventListener('touchmove', startUserGesture, options);
+    doc.addEventListener('touchend', finishUserGesture, options);
+    doc.addEventListener('touchcancel', finishUserGesture, options);
+    doc.addEventListener('mousedown', startUserGesture, options);
+    win.addEventListener('mouseup', finishUserGesture, options);
+
+    iframeCleanupRef.current = () => {
+      doc.removeEventListener('wheel', continueUserGesture, options);
+      doc.removeEventListener('touchstart', startUserGesture, options);
+      doc.removeEventListener('touchmove', startUserGesture, options);
+      doc.removeEventListener('touchend', finishUserGesture, options);
+      doc.removeEventListener('touchcancel', finishUserGesture, options);
+      doc.removeEventListener('mousedown', startUserGesture, options);
+      win.removeEventListener('mouseup', finishUserGesture, options);
+    };
+  };
+
+  const handleIframeLoad = () => {
+    userInteractingRef.current = false;
+    clearResumeAutoScroll();
+    attachIframeInteractionHandlers();
+    startAutoScroll();
   };
 
   const handleResetScroll = () => {
     const iframe = iframeRef.current;
     if (iframe?.contentWindow) {
       try {
+        userInteractingRef.current = false;
+        clearResumeAutoScroll();
         iframe.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
         stopAutoScroll();
-        setTimeout(startAutoScroll, 1000);
-      } catch (err) {}
+        setTimeout(() => startAutoScroll(), 1000);
+      } catch {}
     }
   };
 
   useEffect(() => {
-    startAutoScroll();
-    return () => stopAutoScroll();
-  }, [activeIdx]);
+    return () => {
+      if (scrollIntervalRef.current) {
+        clearTimeout(scrollIntervalRef.current);
+        scrollIntervalRef.current = null;
+      }
+      if (resumeAutoScrollRef.current) {
+        clearTimeout(resumeAutoScrollRef.current);
+        resumeAutoScrollRef.current = null;
+      }
+      iframeCleanupRef.current?.();
+      iframeCleanupRef.current = null;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
@@ -158,7 +271,6 @@ export default function TemplatesPage() {
             {/* Swiper Slider */}
             <div className="w-full py-4">
               <Swiper
-                className="templates-swiper"
                 spaceBetween={20}
                 slidesPerView={1.5}
                 centeredSlides={true}
@@ -169,6 +281,10 @@ export default function TemplatesPage() {
                   768: { slidesPerView: 2.5 },
                 }}
                 onSlideChange={(swiper) => {
+                  userInteractingRef.current = false;
+                  clearResumeAutoScroll();
+                  stopAutoScroll();
+                  cleanupIframeInteractionHandlers();
                   setActiveIdx(swiper.activeIndex);
                 }}
               >
@@ -255,7 +371,7 @@ export default function TemplatesPage() {
                   src={`${activeTemplate.previewUrl}${activeTemplate.previewUrl.includes('?') ? '&' : '?'}autoOpen=true`}
                   className="w-full h-full border-none pt-4 bg-white"
                   title="Template Live Preview"
-                  onLoad={startAutoScroll}
+                  onLoad={handleIframeLoad}
                 />
               )}
             </div>

@@ -538,11 +538,9 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
           <p className="footer-thank" style={{ fontStyle: 'italic', opacity: 0.8, fontSize: '0.9rem', marginBottom: '1rem', color: '#c5a880' }}>
             {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!'}
           </p>
-          {(!card.plan_id || card.plan_id === 'basic') && (
             <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link" style={{ fontSize: '0.8rem', opacity: 0.6, textDecoration: 'none', color: 'inherit', display: 'block', marginTop: '0.5rem' }}>
               ❦ loobycard.com
             </a>
-          )}
         </footer>
 
         {/* Bottom decor image */}

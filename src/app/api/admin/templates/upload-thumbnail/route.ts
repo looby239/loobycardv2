@@ -12,16 +12,25 @@ export async function POST(request: Request) {
     }
 
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `${templateId}/thumbnail.${ext}`;
+    const safeExt = ext.replace(/[^a-z0-9]/g, '') || 'jpg';
+    const fileName = `${templateId}/thumbnail-${Date.now()}.${safeExt}`;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Ensure bucket exists
+    try {
+      await supabaseAdmin.storage.createBucket('template-thumbnails', { public: true });
+    } catch {
+      // Ignore error if bucket already exists
+    }
+
     // Upload to Supabase storage
-    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+    const { error: uploadError } = await supabaseAdmin.storage
       .from('template-thumbnails')
       .upload(fileName, buffer, {
         contentType: file.type || 'image/jpeg',
-        upsert: true,
+        cacheControl: '3600',
+        upsert: false,
       });
 
     if (uploadError) throw uploadError;
@@ -33,17 +42,20 @@ export async function POST(request: Request) {
 
     const publicUrl = urlData.publicUrl;
 
+    const updatedAt = new Date().toISOString();
+
     // Update template_configs
     const { error: updateError } = await supabaseAdmin
       .from('template_configs')
-      .update({ thumbnail_url: publicUrl, updated_at: new Date().toISOString() })
+      .update({ thumbnail_url: publicUrl, updated_at: updatedAt })
       .eq('id', templateId);
 
     if (updateError) throw updateError;
 
-    return NextResponse.json({ success: true, url: publicUrl });
-  } catch (error: any) {
+    return NextResponse.json({ success: true, url: publicUrl, updated_at: updatedAt });
+  } catch (error: unknown) {
     console.error('POST /api/admin/templates/upload-thumbnail error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Upload failed';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -249,6 +249,27 @@ section {
   box-shadow: 0 0 5px rgba(163, 29, 22, 0.2);
 }
 
+/* Footer */
+.wedding-footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  margin-top: 2rem;
+}
+
+.footer-link {
+  color: var(--color-primary);
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.75;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-link:hover {
+  opacity: 1;
+}
+
 /* Return button */
 .return-nav {
   position: fixed;

@@ -653,9 +653,7 @@ export default function Template13({ card, previewMode = false }: TemplateProps)
         {/* Footer */}
         <footer className="wedding-footer">
           <p className="footer-thank">{card.thank_you_text || 'Sự hiện diện của bạn là món quà ý nghĩa nhất đối với chúng tôi!'}</p>
-          {(!card.plan_id || card.plan_id === 'basic') && (
             <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link">☘ Loobycard.com</a>
-          )}
         </footer>
 
         {/* Bottom leaf decoration */}

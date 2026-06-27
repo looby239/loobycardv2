@@ -203,9 +203,13 @@ CREATE TABLE IF NOT EXISTS template_configs (
   thumbnail_url TEXT,                    -- Custom uploaded thumbnail URL
   is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
   css_override TEXT NOT NULL DEFAULT '', -- Admin CSS injected into live render
+  sample_data JSONB NOT NULL DEFAULT '{}'::jsonb, -- Editable sample invitation data for template preview
   sort_order INTEGER NOT NULL DEFAULT 0,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE template_configs
+  ADD COLUMN IF NOT EXISTS sample_data JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 ALTER TABLE template_configs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow service role full access on template_configs"

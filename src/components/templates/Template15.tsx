@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
-import { Heart, Volume2, VolumeX, MailOpen, Calendar, Clock, MapPin, Check, RefreshCw } from 'lucide-react';
+import { Heart, Volume2, VolumeX, MailOpen, MapPin, Check, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 
@@ -25,6 +25,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [loadingWishes, setLoadingWishes] = useState(false);
   const [showGiftModal, setShowGiftModal] = useState(false);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   // RSVP Form state
   const [rsvpName, setRsvpName] = useState('');
@@ -43,6 +44,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
   useEffect(() => {
     if (previewMode) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWishes([
         { id: 1, guest_name: 'Minh Khang', message: 'Chúc hai bạn trăm năm hạnh phúc! Chúc Thành Lộc & Minh Thư mãi mãi yêu thương bền chặt, gia đình ngập tràn may mắn.', created_at: new Date().toISOString() },
         { id: 2, guest_name: 'Thùy Trang', message: 'Chúc mừng đôi bạn trẻ! Thật tiếc vì mình đang ở nước ngoài không thể trực tiếp dự tiệc cưới. Chúc hai bạn bạc đầu nghĩa tình!', created_at: new Date().toISOString() },
@@ -297,7 +299,12 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
             {card.cover_image_url && (
               <div className="hero-frame-container mt-6 mx-auto max-w-sm overflow-hidden rounded-2xl border-4 border-white shadow-lg">
-                <img src={card.cover_image_url} alt="Cover image" className="w-full h-80 object-cover" />
+                <img
+                  src={card.cover_image_url}
+                  alt="Cover image"
+                  className="w-full h-80 object-cover cursor-zoom-in"
+                  onClick={() => setLightboxImg(card.cover_image_url)}
+                />
               </div>
             )}
 
@@ -379,7 +386,11 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Tình yêu ngọt ngào qua những khung hình</p>
             <div className="gallery-grid grid grid-cols-2 gap-4 max-w-md mx-auto">
               {card.album_images.map((imgUrl, i) => (
-                <div key={i} className="gallery-item overflow-hidden rounded-xl shadow-sm border border-slate-100">
+                <div
+                  key={i}
+                  className="gallery-item overflow-hidden rounded-xl shadow-sm border border-slate-100 cursor-zoom-in"
+                  onClick={() => setLightboxImg(imgUrl)}
+                >
                   <img
                     src={imgUrl}
                     alt={`Album wedding ${i + 1}`}
@@ -710,6 +721,26 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Lightbox Modal Overlay */}
+      {lightboxImg && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4"
+          id="lightbox"
+          onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}
+        >
+          <button
+            className="absolute right-5 top-5 z-[81] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-3xl leading-none text-white transition hover:bg-white/20"
+            id="lightbox-close"
+            onClick={() => setLightboxImg(null)}
+          >
+            ×
+          </button>
+          <div className="flex max-h-[90vh] max-w-[92vw] items-center justify-center">
+            <img src={lightboxImg} alt="Photo Fullscreen" className="max-h-[90vh] max-w-full object-contain shadow-2xl" id="lightbox-img" />
           </div>
         </div>
       )}

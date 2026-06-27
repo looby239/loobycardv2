@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Save,
   Settings,
+  Trash2,
   Upload,
   Users,
   X,
@@ -352,6 +353,40 @@ export default function AdminTemplatesPage() {
       await fetchTemplates();
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Khong the duplicate template', 'error');
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const deleteTemplate = async (template: TemplateConfig) => {
+    const confirmed = window.confirm(
+      `Xóa template "${template.name}"?\n\nHành động này không thể hoàn tác. Template sẽ không xóa được nếu đã có thiệp sử dụng hoặc có custom template phụ thuộc.`
+    );
+
+    if (!confirmed) return;
+
+    setSaving(template.id);
+    try {
+      const res = await fetch(`/api/admin/templates?id=${encodeURIComponent(template.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Không thể xóa template');
+      }
+
+      setTemplates((prev) => {
+        const nextTemplates = prev.filter((item) => item.id !== template.id);
+        if (selectedTemplateId === template.id && nextTemplates[0]) {
+          loadSampleForTemplate(nextTemplates[0]);
+        }
+        return nextTemplates;
+      });
+      showToast('Đã xóa template');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Không thể xóa template', 'error');
+      void fetchTemplates();
     } finally {
       setSaving(null);
     }
@@ -755,6 +790,16 @@ export default function AdminTemplatesPage() {
             style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 10px', borderRadius: 8, border: '1px solid #c7d2fe', background: '#eef2ff', color: '#4f46e5', fontSize: 11, fontWeight: 800, cursor: 'pointer' }}
           >
             <Settings size={12} /> Sửa mẫu
+          </button>
+          <button
+            type="button"
+            onClick={() => void deleteTemplate(tmpl)}
+            disabled={saving === tmpl.id}
+            title="Xóa template"
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '7px 10px', borderRadius: 8, border: '1px solid #fecaca', background: '#fff5f5', color: '#dc2626', fontSize: 11, fontWeight: 800, cursor: saving === tmpl.id ? 'wait' : 'pointer' }}
+          >
+            {saving === tmpl.id ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={12} />}
+            Xóa
           </button>
         </div>
       </div>

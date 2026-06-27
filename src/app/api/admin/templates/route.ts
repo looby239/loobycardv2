@@ -249,17 +249,18 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Missing template id' }, { status: 400 });
     }
 
-    const [{ count: cardCount }, { count: childCount }] = await Promise.all([
+    const [{ count: cardCount }, { count: configChildCount }, { count: templateChildCount }] = await Promise.all([
       supabaseAdmin.from('cards').select('id', { count: 'exact', head: true }).eq('template_id', id),
       supabaseAdmin.from('template_configs').select('id', { count: 'exact', head: true }).eq('base_template_id', id),
+      supabaseAdmin.from('templates').select('id', { count: 'exact', head: true }).eq('base_template_id', id),
     ]);
 
     if ((cardCount || 0) > 0) {
-      return NextResponse.json({ error: 'Cannot delete a template that is used by cards' }, { status: 409 });
+      return NextResponse.json({ error: 'Không thể xóa template đang được thiệp sử dụng' }, { status: 409 });
     }
 
-    if ((childCount || 0) > 0) {
-      return NextResponse.json({ error: 'Cannot delete a template that has custom templates' }, { status: 409 });
+    if ((configChildCount || 0) > 0 || (templateChildCount || 0) > 0) {
+      return NextResponse.json({ error: 'Không thể xóa template đang có custom template phụ thuộc' }, { status: 409 });
     }
 
     const { error } = await supabaseAdmin.from('template_configs').delete().eq('id', id);

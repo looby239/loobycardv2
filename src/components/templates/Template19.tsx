@@ -42,6 +42,7 @@ export default function Template19({ card, previewMode = false }: TemplateProps)
 
   useEffect(() => {
     if (previewMode) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWishes([
         { id: 1, guest_name: 'Minh Khang', message: 'Chúc hai bạn trăm năm hạnh phúc! Chúc Thành Lộc & Minh Thư mãi mãi yêu thương bền chặt, gia đình ngập tràn may mắn.', created_at: new Date().toISOString() },
         { id: 2, guest_name: 'Thùy Trang', message: 'Chúc mừng đôi bạn trẻ! Thật tiếc vì mình đang ở nước ngoài không thể trực tiếp dự tiệc cưới. Chúc hai bạn bạc đầu nghĩa tình!', created_at: new Date().toISOString() },
@@ -706,7 +707,7 @@ export default function Template19({ card, previewMode = false }: TemplateProps)
 
       {/* Photo Lightbox Modal Overlay */}
       {lightboxImg && (
-        <div className="lightbox-overlay active" id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}>
+        <div className="lightbox-overlay active open" id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}>
           <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)}>&times;</button>
           <div className="lightbox-content">
             <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" />

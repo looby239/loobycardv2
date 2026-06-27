@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getMapIframeSrc } from '@/lib/mapUtils';
+import { buildVietQrUrl } from '@/lib/vietqr';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-17.css';
@@ -181,10 +182,9 @@ export default function Template17({ card, previewMode = false }: TemplateProps)
   };
 
   const getQR = (bank?: string | null, acc?: string | null, holder?: string | null) => {
-    if (!bank || !acc) return '';
     const name = holder || '';
     const memo = `Mung cuoi ${card.groom_name} ${card.bride_name}`;
-    return `https://img.vietqr.io/image/${bank}-${acc}-compact2.png?amount=0&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(name)}`;
+    return buildVietQrUrl({ bank, account: acc, accountName: name, memo });
   };
 
   const getCalendar = () => {

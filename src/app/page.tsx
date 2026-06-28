@@ -8,6 +8,46 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const [highlightThumbnails, setHighlightThumbnails] = useState<Array<{ id: string; name: string; image: string }>>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/admin/templates')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.templates?.length > 0) {
+          const sorted = [...data.templates]
+            .sort((a, b) => b.sort_order - a.sort_order)
+            .slice(0, 5)
+            .map(t => ({
+              id: t.id,
+              name: t.name || 'Mẫu thiệp',
+              image: t.thumbnail_url || t.defaultThumbnail || `/assets/images/${t.id}/preview.png`
+            }));
+          setHighlightThumbnails(sorted);
+        } else {
+          throw new Error('No templates');
+        }
+      })
+      .catch(() => {
+        setHighlightThumbnails([
+          { id: 'template-19', name: 'Minimalism Đỏ (Template 19)', image: '/assets/images/template-19/photo1.jpg' },
+          { id: 'template-18', name: 'Vườn Xuân Đỏ (Template 18)', image: '/assets/images/template-18/photo1.jpg' },
+          { id: 'template-17', name: 'Hoa Mộc Hồng (Template 17)', image: '/assets/images/template-17/photo1.jpg' },
+          { id: 'template-16', name: 'Thanh Diệp Xanh (Template 16)', image: '/assets/images/template-16/preview.png' },
+          { id: 'template-15', name: 'Thành Lộc & Minh Thư (Template 15)', image: '/assets/images/template-15/preview.png' }
+        ]);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (highlightThumbnails.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % highlightThumbnails.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [highlightThumbnails.length]);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -220,14 +260,33 @@ export default function HomePage() {
             </div>
 
             <div className="flex-1 flex justify-center">
-              <div className="phone-mockup border-[12px] border-secondary rounded-[2.5rem] h-[500px] w-[260px] shadow-xl overflow-hidden bg-white relative">
+              <div className="phone-mockup border-[12px] border-secondary rounded-[2.5rem] h-[500px] w-[260px] shadow-xl overflow-hidden bg-slate-900 relative">
                 {/* Speaker / Camera notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-28 bg-secondary rounded-b-xl z-20"></div>
-                <iframe
-                  src="/templates/template-11/index.html"
-                  className="w-full h-full border-none pointer-events-none"
-                  title="Highlight template"
-                />
+                
+                {/* Slideshow container */}
+                <div className="relative w-full h-full">
+                  {highlightThumbnails.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                        index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                      }`}
+                    >
+                      <img
+                        src={slide.image}
+                        alt={slide.name}
+                        className="w-full h-full object-cover animate-fade-in"
+                      />
+                      {/* Name tag at bottom */}
+                      <div className="absolute bottom-6 left-0 right-0 text-center z-20 px-2">
+                        <span className="bg-black/75 text-white text-[10px] font-bold px-3 py-1.5 rounded-full inline-block shadow backdrop-blur-sm tracking-wide">
+                          {slide.name}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

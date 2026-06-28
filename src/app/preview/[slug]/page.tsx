@@ -63,7 +63,7 @@ export default async function PreviewPage({ params }: PageProps) {
     if (templateConfigRow?.base_template_key) {
       templateKey = templateConfigRow.base_template_key;
     }
-    if (templateConfigRow?.is_custom_template && templateConfigRow.config) {
+    if (templateConfigRow?.config) {
       customTemplateConfig = templateConfigRow.config;
     }
   } catch (e) {

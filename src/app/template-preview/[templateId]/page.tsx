@@ -63,7 +63,7 @@ export default async function TemplatePreviewPage({ params, searchParams }: Page
     ...mergeTemplateSample(renderKey, config?.sample_data),
     template_id: templateId,
   };
-  const templateConfig = previewConfig || (config?.is_custom_template ? normalizeTemplateConfig(config.config) : undefined);
+  const templateConfig = previewConfig || (config?.config ? normalizeTemplateConfig(config.config) : undefined);
 
   return (
     <TemplateResolver

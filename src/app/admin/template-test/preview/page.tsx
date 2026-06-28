@@ -72,7 +72,7 @@ export default async function AdminTemplateTestPreviewPage({ searchParams }: Pag
 
   const renderKey = template.base_template_key || templateId;
   const card = buildTemplateTestCard(templateId, planId);
-  const templateConfig = template.is_custom_template
+  const templateConfig = template.config
     ? normalizeTemplateConfig(template.config)
     : undefined;
 

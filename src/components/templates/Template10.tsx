@@ -241,7 +241,7 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
   };
 
   const coverImage = card.cover_image_url || '/templates/template-10/assets/images/cover_photo.png';
-  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : ['/templates/template-10/assets/images/cover_photo.png'];
+  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : (previewMode ? ['/templates/template-10/assets/images/cover_photo.png'] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
 

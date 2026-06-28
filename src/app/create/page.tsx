@@ -28,7 +28,7 @@ interface DraftData {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
-  
+
   bride_name: string;
   groom_name: string;
   bride_father_name: string;
@@ -95,8 +95,8 @@ const DEFAULT_DRAFT = (): DraftData => ({
   music_url: '',
   slug: '',
   manage_token: Math.random().toString(36).substring(2, 13).toUpperCase(),
-  groom_role: 'Chú rể',
-  bride_role: 'Cô dâu',
+  groom_role: '',
+  bride_role: '',
   groom_bank_name: '',
   groom_bank_account: '',
   groom_bank_holder: '',
@@ -120,6 +120,23 @@ const PLAN_NAMES: Record<string, string> = {
   luxury: 'Gói Luxury',
 };
 
+const capitalizeWords = (str: string) => {
+  if (!str) return '';
+  return str
+    .split(' ')
+    .map((word) => (word ? word.charAt(0).toUpperCase() + word.slice(1) : ''))
+    .join(' ');
+};
+
+const AVAILABLE_SONGS = [
+  { name: 'Phím Dương Cầm Đón Dâu (Wedding Piano)', url: '/assets/audio/wedding-piano.mp3' },
+  { name: 'Beautiful In White (Piano Instrumental)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+  { name: 'A Thousand Years (Violin & Cello)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { name: 'Marry You (Acoustic Guitar)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  { name: 'Perfect (Romantic Piano Solo)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+  { name: 'Until I Found You (Dreamy Instrumental)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
+];
+
 function CreateWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -128,17 +145,17 @@ function CreateWizard() {
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<DraftData>(DEFAULT_DRAFT());
-  
+
   // Checking states
   const [slugChecking, setSlugChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugError, setSlugError] = useState<string | null>(null);
-  
+
   // Uploading states
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAlbum, setUploadingAlbum] = useState(false);
   const [uploadingMusic, setUploadingMusic] = useState(false);
-  
+
   // General validation errors for current step
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -183,7 +200,7 @@ function CreateWizard() {
     }
     saveDraft({ ...formData, wedding_schedule: list });
   };
-  
+
   // Submission
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -252,7 +269,7 @@ function CreateWizard() {
   const handleCheckSlug = async (slugVal: string) => {
     const cleanSlug = slugVal.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
     saveDraft({ ...formData, slug: cleanSlug });
-    
+
     if (cleanSlug.length < 3) {
       setSlugAvailable(null);
       setSlugError('Đường dẫn phải có ít nhất 3 ký tự');
@@ -417,7 +434,7 @@ function CreateWizard() {
   // Validate step details
   const validateStep = (): boolean => {
     const stepErrors: Record<string, string> = {};
-    
+
     if (step === 1) {
       if (!formData.customer_name.trim()) stepErrors.customer_name = 'Họ tên là bắt buộc';
       if (!formData.customer_email.trim()) {
@@ -428,6 +445,8 @@ function CreateWizard() {
     } else if (step === 2) {
       if (!formData.bride_name.trim()) stepErrors.bride_name = 'Tên cô dâu là bắt buộc';
       if (!formData.groom_name.trim()) stepErrors.groom_name = 'Tên chú rể là bắt buộc';
+      if (!formData.groom_role.trim()) stepErrors.groom_role = 'Vai vế chú rể là bắt buộc';
+      if (!formData.bride_role.trim()) stepErrors.bride_role = 'Vai vế cô dâu là bắt buộc';
     } else if (step === 3) {
       if (!formData.event_date) {
         stepErrors.event_date = 'Ngày tổ chức là bắt buộc';
@@ -501,7 +520,7 @@ function CreateWizard() {
     const accountName = 'NGUYEN THANH LOC';
     const amount = PLAN_PRICES[plan];
     const memo = `LOOBYCARD-${formData.slug}`;
-    
+
     return `https://img.vietqr.io/image/${bankId}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accountName)}`;
   };
 
@@ -524,7 +543,7 @@ function CreateWizard() {
 
       {/* Main wizard area */}
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-8">
-        
+
         {/* Progress indicator */}
         {!saveSuccess && (
           <div className="mb-8">
@@ -543,7 +562,7 @@ function CreateWizard() {
 
         {/* Card Body */}
         <div className="bg-white rounded-3xl shadow-md border border-slate-100 p-6 md:p-8 space-y-6">
-          
+
           {saveSuccess ? (
             /* Thank you & Payment screen */
             <div className="text-center space-y-8 py-4">
@@ -614,15 +633,14 @@ function CreateWizard() {
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-slate-900 font-serif">Bước 1: Thông tin khách hàng</h2>
                   <p className="text-slate-400 text-xs">Chúng tôi sẽ sử dụng email này để gửi link quản lý thiệp, quản lý RSVP và ảnh QR code sau khi duyệt.</p>
-                  
+
                   <div className="space-y-4 pt-2">
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Họ tên của bạn *</label>
                       <input
                         type="text"
-                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${
-                          errors.customer_name ? 'border-red-500' : 'border-slate-200'
-                        }`}
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${errors.customer_name ? 'border-red-500' : 'border-slate-200'
+                          }`}
                         placeholder="Nhập họ và tên..."
                         value={formData.customer_name}
                         onChange={(e) => saveDraft({ ...formData, customer_name: e.target.value })}
@@ -634,9 +652,8 @@ function CreateWizard() {
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Địa chỉ Email nhận thiệp *</label>
                       <input
                         type="email"
-                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${
-                          errors.customer_email ? 'border-red-500' : 'border-slate-200'
-                        }`}
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${errors.customer_email ? 'border-red-500' : 'border-slate-200'
+                          }`}
                         placeholder="ten-cua-ban@gmail.com"
                         value={formData.customer_email}
                         onChange={(e) => saveDraft({ ...formData, customer_email: e.target.value })}
@@ -669,12 +686,11 @@ function CreateWizard() {
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Tên Chú Rể *</label>
                       <input
                         type="text"
-                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${
-                          errors.groom_name ? 'border-red-500' : 'border-slate-200'
-                        }`}
-                        placeholder="Ví dụ: Thành Lộc"
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${errors.groom_name ? 'border-red-500' : 'border-slate-200'
+                          }`}
+                        placeholder="Tên Chú rể"
                         value={formData.groom_name}
-                        onChange={(e) => saveDraft({ ...formData, groom_name: e.target.value })}
+                        onChange={(e) => saveDraft({ ...formData, groom_name: capitalizeWords(e.target.value) })}
                       />
                       {errors.groom_name && <span className="text-xs text-red-500 mt-1 block">{errors.groom_name}</span>}
                     </div>
@@ -683,12 +699,11 @@ function CreateWizard() {
                       <label className="block text-sm font-semibold text-slate-700 mb-1">Tên Cô Dâu *</label>
                       <input
                         type="text"
-                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${
-                          errors.bride_name ? 'border-red-500' : 'border-slate-200'
-                        }`}
-                        placeholder="Ví dụ: Minh Thư"
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 ${errors.bride_name ? 'border-red-500' : 'border-slate-200'
+                          }`}
+                        placeholder="Tên Cô dâu"
                         value={formData.bride_name}
-                        onChange={(e) => saveDraft({ ...formData, bride_name: e.target.value })}
+                        onChange={(e) => saveDraft({ ...formData, bride_name: capitalizeWords(e.target.value) })}
                       />
                       {errors.bride_name && <span className="text-xs text-red-500 mt-1 block">{errors.bride_name}</span>}
                     </div>
@@ -697,24 +712,28 @@ function CreateWizard() {
                   {/* Groom & Bride Roles Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1">Vai vế Chú Rể</label>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Vai vế Chú Rể *</label>
                       <input
                         type="text"
-                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 text-sm"
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 text-sm ${errors.groom_role ? 'border-red-500' : 'border-slate-200'
+                          }`}
                         placeholder="Ví dụ: Trưởng Nam, Thứ Nam, Chú rể"
                         value={formData.groom_role}
-                        onChange={(e) => saveDraft({ ...formData, groom_role: e.target.value })}
+                        onChange={(e) => saveDraft({ ...formData, groom_role: capitalizeWords(e.target.value) })}
                       />
+                      {errors.groom_role && <span className="text-xs text-red-500 mt-1 block">{errors.groom_role}</span>}
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1">Vai vế Cô Dâu</label>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1">Vai vế Cô Dâu *</label>
                       <input
                         type="text"
-                        className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 text-sm"
+                        className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 text-sm ${errors.bride_role ? 'border-red-500' : 'border-slate-200'
+                          }`}
                         placeholder="Ví dụ: Út Nữ, Trưởng Nữ, Cô dâu"
                         value={formData.bride_role}
-                        onChange={(e) => saveDraft({ ...formData, bride_role: e.target.value })}
+                        onChange={(e) => saveDraft({ ...formData, bride_role: capitalizeWords(e.target.value) })}
                       />
+                      {errors.bride_role && <span className="text-xs text-red-500 mt-1 block">{errors.bride_role}</span>}
                     </div>
                   </div>
 
@@ -722,7 +741,7 @@ function CreateWizard() {
                   {plan !== 'basic' ? (
                     <div className="space-y-4 border-t border-slate-100 pt-4 mt-2">
                       <h3 className="font-bold text-sm text-slate-800">Thông tin phụ huynh (Gói Premium & Luxury)</h3>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-3">
                           <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nhà Trai</h4>
@@ -800,16 +819,15 @@ function CreateWizard() {
               {step === 3 && (
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-slate-900 font-serif">Bước 3: Sự kiện & Đường dẫn thiệp</h2>
-                  
+
                   <div className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1">Ngày tổ chức *</label>
                         <input
                           type="date"
-                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none text-sm ${
-                            errors.event_date ? 'border-red-500' : 'border-slate-200'
-                          }`}
+                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none text-sm ${errors.event_date ? 'border-red-500' : 'border-slate-200'
+                            }`}
                           value={formData.event_date}
                           onChange={(e) => saveDraft({ ...formData, event_date: e.target.value })}
                         />
@@ -844,9 +862,8 @@ function CreateWizard() {
                         <label className="block text-sm font-semibold text-slate-700 mb-1">Địa điểm tổ chức *</label>
                         <input
                           type="text"
-                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none ${
-                            errors.venue_name ? 'border-red-500' : 'border-slate-200'
-                          }`}
+                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none ${errors.venue_name ? 'border-red-500' : 'border-slate-200'
+                            }`}
                           placeholder="Ví dụ: Golden Palace"
                           value={formData.venue_name}
                           onChange={(e) => saveDraft({ ...formData, venue_name: e.target.value })}
@@ -858,9 +875,8 @@ function CreateWizard() {
                         <label className="block text-sm font-semibold text-slate-700 mb-1">Địa chỉ chi tiết *</label>
                         <input
                           type="text"
-                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none ${
-                            errors.venue_address ? 'border-red-500' : 'border-slate-200'
-                          }`}
+                          className={`w-full p-3 rounded-xl border bg-slate-50 text-slate-800 focus:outline-none ${errors.venue_address ? 'border-red-500' : 'border-slate-200'
+                            }`}
                           placeholder="Ví dụ: 333 Võ Thị Sáu, Liên Hương, Lâm Đồng"
                           value={formData.venue_address}
                           onChange={(e) => saveDraft({ ...formData, venue_address: e.target.value })}
@@ -926,12 +942,12 @@ function CreateWizard() {
                         <input
                           type="text"
                           className="flex-1 p-3 bg-slate-50 text-slate-800 focus:outline-none font-mono text-xs sm:text-sm"
-                          placeholder="loc-thu"
+                          placeholder="duong-dan"
                           value={formData.slug}
                           onChange={(e) => handleCheckSlug(e.target.value)}
                         />
                       </div>
-                      
+
                       {slugChecking && <p className="text-xs text-slate-400 mt-1">Đang kiểm tra đường dẫn...</p>}
                       {slugAvailable === true && <p className="text-xs text-green-600 mt-1 font-semibold">✓ Đường dẫn này hợp lệ và khả dụng</p>}
                       {slugError && <p className="text-xs text-red-500 mt-1">{slugError}</p>}
@@ -1205,7 +1221,7 @@ function CreateWizard() {
                   <div className="space-y-4 border-t border-slate-100 pt-4">
                     <h3 className="font-bold text-sm text-slate-800 flex items-center gap-1.5"><QrCode size={16} className="text-rose-600" /> Tài khoản nhận phong bao mừng cưới</h3>
                     <p className="text-slate-400 text-[10px]">Thông tin tài khoản và mã QR sẽ tự động hiển thị trên thiệp.</p>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {/* Groom Bank */}
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/50 space-y-3">
@@ -1303,7 +1319,7 @@ function CreateWizard() {
                   {/* Background Music */}
                   <div className="space-y-4 border-t border-slate-100 pt-4">
                     <h3 className="font-bold text-sm text-slate-800 flex items-center gap-1.5"><Music size={16} className="text-rose-600" /> Nhạc nền tự động phát</h3>
-                    
+
                     {plan === 'basic' ? (
                       <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
                         <p className="text-xs text-slate-400">Gói Cơ Bản không hỗ trợ tự chọn nhạc nền. Nâng cấp lên gói Premium hoặc Luxury để sử dụng tính năng này.</p>
@@ -1311,7 +1327,29 @@ function CreateWizard() {
                     ) : (
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <label className="block text-xs font-bold text-slate-700">Tải lên file nhạc MP3</label>
+                          <label className="block text-xs font-bold text-slate-700">Chọn nhạc nền có sẵn</label>
+                          <select
+                            className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
+                            value={formData.music_url}
+                            onChange={(e) => saveDraft({ ...formData, music_url: e.target.value })}
+                          >
+                            <option value="">-- Chọn bài nhạc có sẵn --</option>
+                            {AVAILABLE_SONGS.map((song) => (
+                              <option key={song.url} value={song.url}>
+                                {song.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="relative flex py-2 items-center">
+                          <div className="flex-grow border-t border-slate-200"></div>
+                          <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-semibold uppercase">Hoặc</span>
+                          <div className="flex-grow border-t border-slate-200"></div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold text-slate-700">Tải lên file nhạc MP3 mới</label>
                           <div className="flex items-center gap-4">
                             <label className="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl text-xs inline-flex items-center gap-1.5 transition">
                               <Upload size={12} />
@@ -1345,7 +1383,7 @@ function CreateWizard() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="block text-xs font-bold text-slate-700">Đường dẫn liên kết nhạc nền (URL MP3)</label>
+                          <label className="block text-xs font-bold text-slate-700">Nhập đường dẫn liên kết nhạc nền (URL MP3)</label>
                           <input
                             type="url"
                             className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"

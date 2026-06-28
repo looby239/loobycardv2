@@ -269,12 +269,12 @@ export default function Template13({ card, previewMode = false }: TemplateProps)
     : '08 tháng 06, 2026';
 
   const coverImage = card.cover_image_url || '/assets/images/template-13/photo1.webp';
-  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : [
+  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : (previewMode ? [
     '/assets/images/template-13/photo2.webp',
     '/assets/images/template-13/photo3.webp',
     '/assets/images/template-13/photo4.webp',
     '/assets/images/template-13/photo5.webp',
-  ];
+  ] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
 

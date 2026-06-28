@@ -258,12 +258,12 @@ export default function Template18({ card, previewMode = false }: TemplateProps)
   const yearNum = eventDateObj.getFullYear();
 
   const coverImage = card.cover_image_url || '/assets/images/template-18/photo1.jpg';
-  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : [
+  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : (previewMode ? [
     '/assets/images/template-18/photo2.jpg',
     '/assets/images/template-18/photo3.jpg',
     '/assets/images/template-18/photo4.jpg',
     '/assets/images/template-18/photo5.jpg',
-  ];
+  ] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
 

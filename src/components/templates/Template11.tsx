@@ -250,14 +250,14 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
     : 'Chủ Nhật, 25 Tháng 10 Năm 2026';
 
   const coverImage = card.cover_image_url || '/assets/images/template-11/photo1.webp';
-  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : [
+  const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : (previewMode ? [
     '/assets/images/template-11/photo2.webp',
     '/assets/images/template-11/photo3.webp',
     '/assets/images/template-11/photo4.webp',
     '/assets/images/template-11/photo5.webp',
     '/assets/images/template-11/photo6.webp',
     '/assets/images/template-11/photo7.webp',
-  ];
+  ] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
 

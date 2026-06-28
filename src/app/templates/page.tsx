@@ -51,6 +51,7 @@ export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>(FALLBACK_TEMPLATES);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [swiperInstance, setSwiperInstance] = useState<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const resumeAutoScrollRef = useRef<NodeJS.Timeout | null>(null);
@@ -283,6 +284,7 @@ export default function TemplatesPage() {
                 slidesPerView={1.5}
                 centeredSlides={true}
                 initialSlide={0}
+                onSwiper={setSwiperInstance}
                 breakpoints={{
                   480: { slidesPerView: 1.8 },
                   640: { slidesPerView: 2.2 },
@@ -299,6 +301,7 @@ export default function TemplatesPage() {
                 {templates.map((tpl, idx) => (
                   <SwiperSlide key={tpl.id}>
                     <div
+                      onClick={() => swiperInstance?.slideTo(idx)}
                       className={`rounded-2xl overflow-hidden border-2 cursor-pointer transition-all duration-300 ${
                         activeIdx === idx
                           ? 'border-rose-500 scale-105 shadow-lg shadow-rose-950/20'

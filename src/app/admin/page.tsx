@@ -49,8 +49,18 @@ interface CardRecord {
   album_images?: string[];
   card_images?: { image_url: string; sort_order: number }[];
   has_schedule?: boolean;
-  wedding_schedule?: { time: string; title: string; description?: string }[] | null;
 }
+
+const AVAILABLE_SONGS = [
+  { name: 'Phím Dương Cầm Đón Dâu (Wedding Piano)', url: '/assets/audio/wedding-piano.mp3' },
+  { name: 'Beautiful In White (Piano Instrumental)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+  { name: 'A Thousand Years (Violin & Cello)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+  { name: 'Marry You (Acoustic Guitar)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  { name: 'Perfect (Romantic Piano Solo)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+  { name: 'Until I Found You (Dreamy Instrumental)', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
+];
+
+
 
 export default function AdminCardsPage() {
   const handleLogout = async () => {
@@ -1535,32 +1545,55 @@ export default function AdminCardsPage() {
                     </div>
 
                     {/* Music URL */}
-                    <div className="pt-4 border-t border-slate-100">
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nhạc nền (URL hoặc Upload)</label>
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <input
-                            type="url"
-                            className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
-                            value={editFormData.music_url || ''}
-                            onChange={(e) => setEditFormData({ ...editFormData, music_url: e.target.value })}
-                            placeholder="https://..."
-                          />
-                        </div>
-                        <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
-                          <Upload size={16} />
-                          <span>{uploadingMusic ? 'Đang tải lên...' : 'Tải lên mp3'}</span>
-                          <input
-                            type="file"
-                            accept=".mp3,audio/*"
-                            className="hidden"
-                            onChange={(e) => handleFileUpload(e, 'music')}
-                            disabled={uploadingMusic}
-                          />
-                        </label>
+                    <div className="pt-4 border-t border-slate-100 space-y-3">
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nhạc nền</label>
+                      
+                      {/* Select Predefined Songs */}
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-semibold text-slate-400">Chọn nhạc có sẵn</label>
+                        <select
+                          className="w-full p-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800"
+                          value={editFormData.music_url || ''}
+                          onChange={(e) => setEditFormData({ ...editFormData, music_url: e.target.value })}
+                        >
+                          <option value="">-- Chọn bài nhạc có sẵn --</option>
+                          {AVAILABLE_SONGS.map((song) => (
+                            <option key={song.url} value={song.url}>
+                              {song.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
+
+                      {/* Custom URL or upload */}
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-semibold text-slate-400">Hoặc nhập URL / Tải file lên</label>
+                        <div className="flex gap-4">
+                          <div className="flex-1">
+                            <input
+                              type="url"
+                              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-800"
+                              value={editFormData.music_url || ''}
+                              onChange={(e) => setEditFormData({ ...editFormData, music_url: e.target.value })}
+                              placeholder="https://..."
+                            />
+                          </div>
+                          <label className="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm inline-flex items-center gap-1.5 transition">
+                            <Upload size={16} />
+                            <span>{uploadingMusic ? 'Đang tải lên...' : 'Tải lên mp3'}</span>
+                            <input
+                              type="file"
+                              accept=".mp3,audio/*"
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, 'music')}
+                              disabled={uploadingMusic}
+                            />
+                          </label>
+                        </div>
+                      </div>
+
                       {editFormData.music_url && (
-                        <div className="mt-2">
+                        <div className="mt-2 p-2 bg-slate-100 rounded-xl">
                           <audio controls src={editFormData.music_url} className="w-full h-10" />
                         </div>
                       )}

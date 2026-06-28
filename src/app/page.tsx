@@ -74,9 +74,8 @@ function ScrollReveal({ children, className = '' }: { children: React.ReactNode;
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ease-out transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      } ${className}`}
+      className={`transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        } ${className}`}
     >
       {children}
     </div>
@@ -218,8 +217,8 @@ export default function HomePage() {
                 <Heart className="fill-current animate-pulse" size={20} />
               </div>
               <div className="text-left">
-                <strong className="block text-secondary" style={{ fontSize: '1.1rem' }}>+10,000</strong>
-                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Cặp đôi tin dùng</span>
+                <strong className="block text-secondary" style={{ fontSize: '1.1rem' }}>5 phút</strong>
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Để tạo một tấm thiệp mời</span>
               </div>
             </div>
           </div>
@@ -344,15 +343,14 @@ export default function HomePage() {
               <div className="phone-mockup border-[12px] border-secondary rounded-[2.5rem] h-[500px] w-[260px] shadow-xl overflow-hidden bg-slate-900 relative">
                 {/* Speaker / Camera notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-28 bg-secondary rounded-b-xl z-20"></div>
-                
+
                 {/* Slideshow container */}
                 <div className="relative w-full h-full">
                   {highlightThumbnails.map((slide, index) => (
                     <div
                       key={slide.id}
-                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                        index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                      }`}
+                      className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                        }`}
                     >
                       <img
                         src={slide.image}

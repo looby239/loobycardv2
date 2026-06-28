@@ -644,7 +644,7 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
 
       {/* Gift Registry Modal Overlay */}
       {giftModalOpen && (
-        <div className="gift-modal-overlay" id="gift-modal" style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+        <div className="gift-modal-overlay active" id="gift-modal" onClick={(e) => { if (e.target === e.currentTarget) setGiftModalOpen(false); }} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
           <div className="gift-modal-card">
             <button className="gift-modal-close" id="gift-modal-close" onClick={() => setGiftModalOpen(false)}>×</button>
             <h3 className="modal-title">Thông Tin Mừng Cưới</h3>
@@ -657,7 +657,12 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
                   <p className="account-number">Số TK: <strong>{card.groom_bank_account}</strong></p>
                   <div className="qr-code">
                     {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
-                      <img src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <img
+                        src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)}
+                        alt="QR Code"
+                        onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'zoom-in' }}
+                      />
                     )}
                   </div>
                 </div>
@@ -671,7 +676,12 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
                   <p className="account-number">Số TK: <strong>{card.bride_bank_account}</strong></p>
                   <div className="qr-code">
                     {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
-                      <img src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} alt="QR Code" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <img
+                        src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)}
+                        alt="QR Code"
+                        onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'zoom-in' }}
+                      />
                     )}
                   </div>
                 </div>
@@ -683,7 +693,7 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
       {lightboxImg && (
-        <div className="lightbox-overlay" id="lightbox" style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
+        <div className="lightbox-overlay active" id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
           <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '30px', background: 'transparent', border: 'none', cursor: 'pointer' }}>×</button>
           <div className="lightbox-content" style={{ maxWidth: '90vw', maxHeight: '90vh' }}>
             <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} />

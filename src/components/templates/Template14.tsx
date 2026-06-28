@@ -709,7 +709,7 @@ export default function Template14({ card, previewMode = false }: TemplateProps)
 
       {/* Gift Registry Modal Overlay */}
       {giftModalOpen && (
-        <div className="gift-modal-overlay active" id="gift-modal">
+        <div className="gift-modal-overlay active" id="gift-modal" onClick={(e) => { if (e.target === e.currentTarget) setGiftModalOpen(false); }}>
           <div className="gift-modal-card">
             <button className="gift-modal-close" id="gift-modal-close" onClick={() => setGiftModalOpen(false)}>×</button>
             <h3 className="modal-title">Thông Tin Mừng Cưới</h3>
@@ -722,7 +722,12 @@ export default function Template14({ card, previewMode = false }: TemplateProps)
                   <p className="account-number">Số TK: <strong>{card.groom_bank_account}</strong></p>
                   <div className="qr-code">
                     {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
-                      <img src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} alt="Groom QR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <img
+                        src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)}
+                        alt="Groom QR"
+                        onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'zoom-in' }}
+                      />
                     )}
                   </div>
                 </div>
@@ -736,7 +741,12 @@ export default function Template14({ card, previewMode = false }: TemplateProps)
                   <p className="account-number">Số TK: <strong>{card.bride_bank_account}</strong></p>
                   <div className="qr-code">
                     {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
-                      <img src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} alt="Bride QR" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <img
+                        src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)}
+                        alt="Bride QR"
+                        onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'zoom-in' }}
+                      />
                     )}
                   </div>
                 </div>

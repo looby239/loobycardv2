@@ -577,7 +577,7 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
       {lightboxImg && (
-        <div className="lightbox-overlay" id="lightbox" onClick={() => setLightboxImg(null)} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 99999, justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}>
+        <div className="lightbox-overlay active" id="lightbox" onClick={() => setLightboxImg(null)} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 99999, justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}>
           <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '40px', background: 'transparent', border: 'none', cursor: 'pointer', zIndex: 100000 }}>&times;</button>
           <div className="lightbox-content" style={{ maxWidth: '90vw', maxHeight: '90vh' }}>
             <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} />

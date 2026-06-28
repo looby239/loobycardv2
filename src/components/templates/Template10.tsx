@@ -232,12 +232,12 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
     : '01 • 06 • 2026';
 
   // Dynamic VietQR generator
-  const getGroomQR = () => {
-    const bank = card.groom_bank_name || 'TPB';
-    const acc = card.groom_bank_account || '';
-    const name = card.groom_bank_holder || card.groom_name;
+  const getQR = (bank?: string | null, acc?: string | null, holder?: string | null) => {
+    const bankName = bank || 'TPB';
+    const account = acc || '';
+    const name = holder || '';
     const memo = `Mung cuoi ${card.groom_name} ${card.bride_name}`;
-    return buildVietQrUrl({ bank, account: acc, accountName: name, memo });
+    return buildVietQrUrl({ bank: bankName, account, accountName: name, memo });
   };
 
   const coverImage = card.cover_image_url || '/templates/template-10/assets/images/cover_photo.png';
@@ -424,18 +424,47 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* Gift Section */}
-        {card.groom_bank_account && (
+        {(card.groom_bank_account || card.bride_bank_account) && (
           <section className="gift">
-            <h2 className="section-title">Gửi Lời Chúc</h2>
-            <p style={{ marginBottom: '2rem' }}>Nếu không thể tham dự, bạn có thể gửi tiền mừng cưới qua mã QR dưới đây.</p>
-            <div style={{ background: '#fff', padding: '2rem', borderRadius: '15px', border: '2px dashed var(--color-primary)', display: 'inline-block' }}>
-              <i className="fas fa-qrcode" style={{ fontSize: '5rem', color: 'var(--color-primary)', marginBottom: '1rem' }}></i>
-              <h4 style={{ color: 'var(--color-primary)' }}>{card.groom_bank_name}</h4>
-              <p>{card.groom_bank_account}</p>
-              <p><strong>{card.groom_bank_holder}</strong></p>
-              {getGroomQR() && (
-                <div style={{ marginTop: '1rem' }}>
-                  <img src={getGroomQR()} alt="QR" style={{ width: '200px', height: '200px', objectFit: 'contain' }} />
+            <h2 className="section-title">Hộp Mừng Cưới</h2>
+            <p style={{ marginBottom: '2rem' }}>Nếu không thể tham dự, bạn có thể gửi quà mừng cưới đến cô dâu &amp; chú rể qua tài khoản dưới đây.</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
+              {card.groom_bank_account && (
+                <div style={{ background: '#fff', padding: '2rem', borderRadius: '15px', border: '2px dashed var(--color-primary)', display: 'inline-block', minWidth: '240px', flex: '1 1 240px', maxWidth: '280px' }}>
+                  <i className="fas fa-qrcode" style={{ fontSize: '3rem', color: 'var(--color-primary)', marginBottom: '1rem' }}></i>
+                  <h4 style={{ color: 'var(--color-primary)', fontSize: '1.1rem', fontWeight: 'bold' }}>{card.groom_role || 'Chú Rể'}</h4>
+                  <h5 style={{ color: '#555', marginTop: '0.25rem' }}>{card.groom_bank_name}</h5>
+                  <p style={{ margin: '0.25rem 0', fontWeight: 'bold' }}>{card.groom_bank_account}</p>
+                  <p style={{ fontSize: '0.9rem', color: '#666' }}>{card.groom_bank_holder}</p>
+                  {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
+                    <div style={{ marginTop: '1rem' }}>
+                      <img
+                        src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)}
+                        alt="Groom QR"
+                        onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
+                        style={{ width: '160px', height: '160px', objectFit: 'contain', cursor: 'zoom-in', margin: '0 auto' }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+              {card.bride_bank_account && (
+                <div style={{ background: '#fff', padding: '2rem', borderRadius: '15px', border: '2px dashed var(--color-primary)', display: 'inline-block', minWidth: '240px', flex: '1 1 240px', maxWidth: '280px' }}>
+                  <i className="fas fa-qrcode" style={{ fontSize: '3rem', color: 'var(--color-primary)', marginBottom: '1rem' }}></i>
+                  <h4 style={{ color: 'var(--color-primary)', fontSize: '1.1rem', fontWeight: 'bold' }}>{card.bride_role || 'Cô Dâu'}</h4>
+                  <h5 style={{ color: '#555', marginTop: '0.25rem' }}>{card.bride_bank_name}</h5>
+                  <p style={{ margin: '0.25rem 0', fontWeight: 'bold' }}>{card.bride_bank_account}</p>
+                  <p style={{ fontSize: '0.9rem', color: '#666' }}>{card.bride_bank_holder}</p>
+                  {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
+                    <div style={{ marginTop: '1rem' }}>
+                      <img
+                        src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)}
+                        alt="Bride QR"
+                        onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
+                        style={{ width: '160px', height: '160px', objectFit: 'contain', cursor: 'zoom-in', margin: '0 auto' }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

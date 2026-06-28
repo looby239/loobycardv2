@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Check, X, ArrowRight, Menu, X as CloseIcon, Laptop, Star } from 'lucide-react';
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -20,9 +20,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-white text-brand-text font-sans antialiased">
       {/* Navigation */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-b border-brand-border' : 'bg-white/95 backdrop-blur'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-b border-brand-border' : 'bg-white/95 backdrop-blur'
+          }`}
         style={{ height: scrolled ? '70px' : '80px', display: 'flex', alignItems: 'center' }}
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -30,7 +29,7 @@ export default function HomePage() {
             <i className="fa-solid fa-ring text-primary text-xl"></i>
             <span className="text-primary">Looby</span><span className="text-secondary font-extrabold"> - Thiệp mời điện tử</span>
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-brand-text">
             <a href="#features" className="hover:text-primary transition">Tính năng</a>
             <a href="#templates" className="hover:text-primary transition">Mẫu thiệp</a>
@@ -86,12 +85,12 @@ export default function HomePage() {
 
           {/* Hero Image Mockup — centered floating */}
           <div className="relative w-full mx-auto animate-float" style={{ maxWidth: '700px', zIndex: 2, transform: 'translateY(2rem)' }}>
-            <img 
-              src="/assets/images/hero-mockup.png" 
+            <img
+              src="/assets/images/hero-mockup.png"
               alt="Mockup trang web thiệp cưới trên điện thoại"
               style={{ borderRadius: '24px', boxShadow: '0 30px 60px -12px rgba(0,0,0,0.25)', border: '6px solid #FFFFFF', maxHeight: '70vh', objectFit: 'contain', background: '#fff', margin: '0 auto', display: 'block', width: '100%' }}
             />
-            
+
             {/* Floating stat card — top right */}
             <div className="absolute bg-white/90 backdrop-blur flex items-center gap-3 select-none" style={{ top: '10%', right: '-20px', padding: '1rem', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)', border: '1px solid rgba(255,255,255,0.5)', animation: 'float 6s ease-in-out infinite' }}>
               <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EBF3FC', color: '#8FB8ED' }}>
@@ -298,9 +297,9 @@ export default function HomePage() {
                   <span className="text-3xl font-extrabold text-secondary">99.000</span>
                   <span className="text-brand-text-light font-semibold text-sm">VNĐ</span>
                 </div>
-                
+
                 <hr className="my-6 border-brand-border" />
-                
+
                 <ul className="space-y-3 text-sm text-brand-text">
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Sử dụng các mẫu</li>
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Bản đồ đến sự kiện</li>
@@ -330,9 +329,9 @@ export default function HomePage() {
                   <span className="text-3xl font-extrabold text-white">399.000</span>
                   <span className="text-slate-350 font-semibold text-sm">VNĐ</span>
                 </div>
-                
+
                 <hr className="my-6 border-white/10" />
-                
+
                 <ul className="space-y-3 text-sm text-slate-200">
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> <strong>Sử dụng tất cả các mẫu</strong></li>
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Bản đồ đến sự kiện</li>
@@ -359,9 +358,9 @@ export default function HomePage() {
                   <span className="text-3xl font-extrabold text-secondary">1.199.000</span>
                   <span className="text-brand-text-light font-semibold text-sm">VNĐ</span>
                 </div>
-                
+
                 <hr className="my-6 border-brand-border" />
-                
+
                 <ul className="space-y-3 text-sm text-brand-text">
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> <strong>Sử dụng tất cả các mẫu</strong></li>
                   <li className="flex items-center gap-2"><Check size={16} className="text-primary" /> Bản đồ đến sự kiện</li>
@@ -415,7 +414,7 @@ export default function HomePage() {
                 <a href="#" className="w-10 h-10 rounded-full bg-brand-bg-alt flex items-center justify-center text-secondary hover:bg-primary hover:text-white transition shadow-sm"><i className="fa-brands fa-tiktok"></i></a>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <h4 className="font-bold text-secondary text-base">Sản phẩm</h4>
               <ul className="space-y-2 text-sm text-brand-text-light">
@@ -425,7 +424,7 @@ export default function HomePage() {
                 <li><a href="#" className="hover:text-primary transition">Cập nhật mới</a></li>
               </ul>
             </div>
-            
+
             <div className="space-y-4">
               <h4 className="font-bold text-secondary text-base">Hỗ trợ</h4>
               <ul className="space-y-2 text-sm text-brand-text-light">
@@ -434,7 +433,7 @@ export default function HomePage() {
                 <li><a href="#" className="hover:text-primary transition">Liên hệ CSKH</a></li>
               </ul>
             </div>
-            
+
             <div className="space-y-4">
               <h4 className="font-bold text-secondary text-base">Pháp lý</h4>
               <ul className="space-y-2 text-sm text-brand-text-light">
@@ -443,7 +442,7 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-brand-border pt-8 text-center text-sm text-brand-text-light">
             <p>&copy; 2026 LoobyCard.com. Tự hào phát triển tại Việt Nam.</p>
           </div>

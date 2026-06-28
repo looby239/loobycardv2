@@ -678,7 +678,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
       {/* Gift Registry Modal Overlay */}
       {showGiftModal && (
-        <div className="gift-modal-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="gift-modal-overlay active fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowGiftModal(false); }}>
           <div className="gift-modal-card bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[85vh] overflow-y-auto">
             <button
               onClick={() => setShowGiftModal(false)}
@@ -699,7 +699,13 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
                   <p className="account-number font-mono text-sm font-bold text-slate-850 mt-1">Số TK: <strong>{card.groom_bank_account}</strong></p>
                   {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
                     <div className="qr-code mt-3 bg-white p-2 border border-slate-200 rounded-xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner">
-                      <img src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)} alt="Groom Bank QR" className="w-full h-full object-contain" />
+                      <img
+                        src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)}
+                        alt="Groom Bank QR"
+                        onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
+                        className="w-full h-full object-contain cursor-zoom-in"
+                        style={{ cursor: 'zoom-in' }}
+                      />
                     </div>
                   )}
                 </div>
@@ -715,7 +721,13 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
                   <p className="account-number font-mono text-sm font-bold text-slate-850 mt-1">Số TK: <strong>{card.bride_bank_account}</strong></p>
                   {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
                     <div className="qr-code mt-3 bg-white p-2 border border-slate-200 rounded-xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner">
-                      <img src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)} alt="Bride Bank QR" className="w-full h-full object-contain" />
+                      <img
+                        src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)}
+                        alt="Bride Bank QR"
+                        onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
+                        className="w-full h-full object-contain cursor-zoom-in"
+                        style={{ cursor: 'zoom-in' }}
+                      />
                     </div>
                   )}
                 </div>

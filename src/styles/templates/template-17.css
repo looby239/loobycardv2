@@ -419,7 +419,7 @@ section {
 }
 
 .section-title-wrapper::after {
-  content: 'â¦';
+  content: '--+--';
   display: block;
   text-align: center;
   color: var(--color-accent);

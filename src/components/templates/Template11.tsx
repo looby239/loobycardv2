@@ -326,7 +326,7 @@ export default function Template11({ card, previewMode = false }: TemplateProps)
         </section>
 
         {/* Parents Info Section */}
-        {card.plan_id !== 'basic' && (
+        {(card.groom_father_name || card.groom_mother_name || card.bride_father_name || card.bride_mother_name) && (
           <section className="parents-info">
             <div className="parents-grid">
               <div className="family-column">

@@ -737,81 +737,74 @@ function CreateWizard() {
                     </div>
                   </div>
 
-                  {/* Fields hidden for basic plan */}
-                  {plan !== 'basic' ? (
-                    <div className="space-y-4 border-t border-slate-100 pt-4 mt-2">
-                      <h3 className="font-bold text-sm text-slate-800">Thông tin phụ huynh (Gói Premium & Luxury)</h3>
+                  {/* Parent names and addresses */}
+                  <div className="space-y-4 border-t border-slate-100 pt-4 mt-2">
+                    <h3 className="font-bold text-sm text-slate-800">Thông tin phụ huynh</h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nhà Trai</h4>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Tên Cha Chú Rể"
-                              value={formData.groom_father_name}
-                              onChange={(e) => saveDraft({ ...formData, groom_father_name: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Tên Mẹ Chú Rể"
-                              value={formData.groom_mother_name}
-                              onChange={(e) => saveDraft({ ...formData, groom_mother_name: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Địa chỉ nhà chú rể"
-                              value={formData.groom_address}
-                              onChange={(e) => saveDraft({ ...formData, groom_address: e.target.value })}
-                            />
-                          </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nhà Trai</h4>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Tên Cha Chú Rể"
+                            value={formData.groom_father_name}
+                            onChange={(e) => saveDraft({ ...formData, groom_father_name: e.target.value })}
+                          />
                         </div>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Tên Mẹ Chú Rể"
+                            value={formData.groom_mother_name}
+                            onChange={(e) => saveDraft({ ...formData, groom_mother_name: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Địa chỉ nhà chú rể"
+                            value={formData.groom_address}
+                            onChange={(e) => saveDraft({ ...formData, groom_address: e.target.value })}
+                          />
+                        </div>
+                      </div>
 
-                        <div className="space-y-3">
-                          <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nhà Gái</h4>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Tên Cha Cô Dâu"
-                              value={formData.bride_father_name}
-                              onChange={(e) => saveDraft({ ...formData, bride_father_name: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Tên Mẹ Cô Dâu"
-                              value={formData.bride_mother_name}
-                              onChange={(e) => saveDraft({ ...formData, bride_mother_name: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
-                              placeholder="Địa chỉ nhà cô dâu"
-                              value={formData.bride_address}
-                              onChange={(e) => saveDraft({ ...formData, bride_address: e.target.value })}
-                            />
-                          </div>
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Nhà Gái</h4>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Tên Cha Cô Dâu"
+                            value={formData.bride_father_name}
+                            onChange={(e) => saveDraft({ ...formData, bride_father_name: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Tên Mẹ Cô Dâu"
+                            value={formData.bride_mother_name}
+                            onChange={(e) => saveDraft({ ...formData, bride_mother_name: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            className="w-full p-2.5 rounded-lg border border-slate-200 bg-slate-50 text-xs"
+                            placeholder="Địa chỉ nhà cô dâu"
+                            value={formData.bride_address}
+                            onChange={(e) => saveDraft({ ...formData, bride_address: e.target.value })}
+                          />
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-400 flex items-center gap-1.5 border border-slate-200/50 mt-4">
-                      <Coins size={14} />
-                      <span>Nâng cấp gói cước Premium hoặc Luxury để điền thêm thông tin cha mẹ và địa chỉ nhà.</span>
-                    </div>
-                  )}
+                  </div>
                 </div>
               )}
 

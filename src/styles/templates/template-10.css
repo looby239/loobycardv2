@@ -1,4 +1,4 @@
-﻿/* === AUTO CENTER FIX === */
+/* === AUTO CENTER FIX === */
 .t10-wrapper { text-align: center; }
 .template-container { margin-left: auto !important; margin-right: auto !important; width: 100% !important; }
 .t10-wrapper .rsvp-form, .t10-wrapper .wish-form, .t10-wrapper .form-group, .t10-wrapper .timeline-box, .t10-wrapper .guestbook-list, .t10-wrapper .wish-item { text-align: left; }
@@ -342,6 +342,83 @@ section {
   animation: lightboxZoomIn 0.3s ease;
 }
 
+/* Parents / Family Info */
+.parents-info {
+  background-color: #fff;
+  padding: 4rem 2rem;
+  border-bottom: 1px dashed var(--color-gold);
+}
 
+.parents-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .parents-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.family-column {
+  padding: 1.5rem;
+  border: 1px solid rgba(163, 29, 22, 0.15);
+  border-radius: 12px;
+  background-color: var(--color-bg);
+  position: relative;
+  box-shadow: 0 4px 15px rgba(163, 29, 22, 0.03);
+}
+
+.family-column::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--color-gold);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.family-column h3 {
+  font-family: var(--font-serif);
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.parent-name {
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.parent-address {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.couple-role {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--color-primary);
+  border-top: 1px dashed rgba(163, 29, 22, 0.1);
+  padding-top: 0.75rem;
+}
+
+.couple-role strong {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--color-primary);
+}
 
 }

@@ -269,6 +269,28 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
           </div>
         </section>
 
+        {/* Parents Info Section */}
+        {(card.groom_father_name || card.groom_mother_name || card.bride_father_name || card.bride_mother_name) && (
+          <section className="parents-info">
+            <div className="parents-grid">
+              <div className="family-column">
+                <h3>Nhà Trai</h3>
+                {card.groom_father_name && <p className="parent-name">Ông: {card.groom_father_name}</p>}
+                {card.groom_mother_name && <p className="parent-name">Bà: {card.groom_mother_name}</p>}
+                {card.groom_address && <p className="parent-address">{card.groom_address}</p>}
+                <p className="couple-role">{card.groom_role || 'Chú rể'}: <strong>{card.groom_name}</strong></p>
+              </div>
+              <div className="family-column">
+                <h3>Nhà Gái</h3>
+                {card.bride_father_name && <p className="parent-name">Ông: {card.bride_father_name}</p>}
+                {card.bride_mother_name && <p className="parent-name">Bà: {card.bride_mother_name}</p>}
+                {card.bride_address && <p className="parent-address">{card.bride_address}</p>}
+                <p className="couple-role">{card.bride_role || 'Cô dâu'}: <strong>{card.bride_name}</strong></p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Album Section */}
         {albumImages.length > 0 && (() => {
           // Swiper loop requires >= 3 slides. Duplicate if 2 images to enable loop+autoplay.

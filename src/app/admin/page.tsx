@@ -93,6 +93,7 @@ export default function AdminCardsPage() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAlbum, setUploadingAlbum] = useState(false);
   const [uploadingMusic, setUploadingMusic] = useState(false);
+  const [templates, setTemplates] = useState<any[]>([]);
 
   // Local schedule states for admin editing
   const [adminScheduleTime, setAdminScheduleTime] = useState('');
@@ -427,6 +428,14 @@ export default function AdminCardsPage() {
 
   useEffect(() => {
     fetchCards();
+    fetch('/api/admin/templates')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.templates) {
+          setTemplates(data.templates.filter((t: any) => t.is_enabled));
+        }
+      })
+      .catch(err => console.error('Error fetching templates:', err));
   }, []);
 
   // Card payment & publish approval trigger
@@ -1066,6 +1075,21 @@ export default function AdminCardsPage() {
                         <option value="published">Đang chạy (Published)</option>
                         <option value="archived">Đã lưu trữ</option>
                         <option value="expired">Hết hạn</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Giao diện template</label>
+                      <select
+                        className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50 text-slate-850"
+                        value={editFormData.template_id || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, template_id: e.target.value })}
+                      >
+                        <option value="">-- Chọn template --</option>
+                        {templates.map((tpl) => (
+                          <option key={tpl.id} value={tpl.id}>
+                            {tpl.name} ({tpl.id})
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>

@@ -24,7 +24,22 @@ interface TemplateResolverProps {
   templateKey?: string;
 }
 
-function PlanRuleStyles() {
+function PlanRuleStyles({ previewMode = false }: { previewMode?: boolean }) {
+  if (previewMode) {
+    return (
+      <style>{`
+        .template-plan-basic [class*="quote"],
+        .template-plan-basic [class*="rsvp"],
+        .template-plan-basic [class*="guestbook"],
+        .template-plan-basic [id*="rsvp"],
+        .template-plan-basic [id*="wishes"],
+        .template-plan-basic a[href*="rsvp"] {
+          display: none !important;
+        }
+      `}</style>
+    );
+  }
+
   return (
     <style>{`
       .template-plan-basic [class*="quote"],
@@ -316,7 +331,7 @@ export default function TemplateResolver({ card, previewMode = false, cssOverrid
 
   return (
     <>
-      <PlanRuleStyles />
+      <PlanRuleStyles previewMode={previewMode} />
       {/* Inject admin CSS overrides as a scoped <style> block */}
       {cssOverride && cssOverride.trim() && (
         <style dangerouslySetInnerHTML={{ __html: cssOverride }} />

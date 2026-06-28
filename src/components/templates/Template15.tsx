@@ -6,6 +6,7 @@ import { buildVietQrUrl } from '@/lib/vietqr';
 import { Heart, Volume2, VolumeX, MailOpen, MapPin, Check, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
+import '@/styles/templates/template-15.css';
 
 interface TemplateProps {
   card: CardData;
@@ -237,6 +238,8 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             <div className="particle">✨</div>
             <div className="particle">✨</div>
             <div className="particle">✨</div>
+            <div className="particle">✨</div>
+            <div className="particle">✨</div>
           </div>
 
           <div className="envelope-card shadow-2xl">
@@ -272,7 +275,7 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
       {opened && card.music_url && (
         <button
           onClick={toggleMusic}
-          className="music-toggle fixed bottom-6 right-6 h-12 w-12 bg-[#8a5a2a] hover:bg-[#704820] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all z-40"
+          className="music-toggle"
         >
           {musicPlaying ? <Volume2 size={20} className="animate-bounce" /> : <VolumeX size={20} />}
         </button>
@@ -298,13 +301,15 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             </div>
 
             {card.cover_image_url && (
-              <div className="hero-frame-container mt-6 mx-auto max-w-sm overflow-hidden rounded-2xl border-4 border-white shadow-lg">
-                <img
-                  src={card.cover_image_url}
-                  alt="Cover image"
-                  className="w-full h-80 object-cover cursor-zoom-in"
-                  onClick={() => setLightboxImg(card.cover_image_url)}
-                />
+              <div className="hero-frame-container">
+                <div className="hero-frame">
+                  <img
+                    src={card.cover_image_url}
+                    alt="Cover image"
+                    className="hero-image cursor-zoom-in"
+                    onClick={() => setLightboxImg(card.cover_image_url)}
+                  />
+                </div>
               </div>
             )}
 
@@ -324,32 +329,32 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
         {/* Family Information */}
         {card.plan_id !== 'basic' && (
-          <section className="parents-info py-8 px-6 mt-8 bg-[#faf8f5]/60 border-t border-b border-[#c5a880]/20">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-6">
+          <section className="parents-info">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">THÔNG TIN LỄ CƯỚI</h2>
+              <h2 className="section-title">THÔNG TIN LỄ CƯỚI</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <div className="parents-grid grid grid-cols-1 sm:grid-cols-2 gap-8 text-center">
-              <div className="family-column space-y-1">
-                <h3 className="font-bold text-[#8a5a2a] font-serif text-base">Nhà Trai</h3>
-                {card.groom_father_name && <p className="parent-name text-sm">Ông: {card.groom_father_name}</p>}
-                {card.groom_mother_name && <p className="parent-name text-sm">Bà: {card.groom_mother_name}</p>}
-                {card.groom_address && <p className="text-xs text-slate-500"><i className="fas fa-map-marker-alt text-[10px] mr-1"></i> {card.groom_address}</p>}
+            <div className="parents-grid">
+              <div className="family-column">
+                <h3>Nhà Trai</h3>
+                {card.groom_father_name && <p className="parent-name">Ông: {card.groom_father_name}</p>}
+                {card.groom_mother_name && <p className="parent-name">Bà: {card.groom_mother_name}</p>}
+                {card.groom_address && <p className="parent-address"><i className="fas fa-map-marker-alt"></i> {card.groom_address}</p>}
               </div>
 
-              <div className="family-column space-y-1">
-                <h3 className="font-bold text-[#8a5a2a] font-serif text-base">Nhà Gái</h3>
-                {card.bride_father_name && <p className="parent-name text-sm">Ông: {card.bride_father_name}</p>}
-                {card.bride_mother_name && <p className="parent-name text-sm">Bà: {card.bride_mother_name}</p>}
-                {card.bride_address && <p className="text-xs text-slate-500"><i className="fas fa-map-marker-alt text-[10px] mr-1"></i> {card.bride_address}</p>}
+              <div className="family-column">
+                <h3>Nhà Gái</h3>
+                {card.bride_father_name && <p className="parent-name">Ông: {card.bride_father_name}</p>}
+                {card.bride_mother_name && <p className="parent-name">Bà: {card.bride_mother_name}</p>}
+                {card.bride_address && <p className="parent-address"><i className="fas fa-map-marker-alt"></i> {card.bride_address}</p>}
               </div>
             </div>
 
-            <div className="ceremony-announcement text-center mt-8 pt-6 border-t border-slate-200/50">
-              <p className="announcement-text text-[10px] tracking-widest text-slate-400 font-bold uppercase">Trân trọng báo tin lễ thành hôn của hai con</p>
-              <h2 className="couple-names-vertical font-serif font-bold text-xl text-slate-800 mt-2">
-                {card.groom_name} <span className="text-[#8a5a2a] text-base block my-1">&amp;</span> {card.bride_name}
+            <div className="ceremony-announcement">
+              <p className="announcement-text">Trân trọng báo tin lễ thành hôn của hai con</p>
+              <h2 className="couple-names-vertical">
+                {card.groom_name} <span className="and-symbol">&amp;</span> {card.bride_name}
               </h2>
             </div>
           </section>
@@ -366,35 +371,35 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* Ceremony details Card */}
-        <section className="ceremony-details py-6 px-6 text-center">
-          <div className="ceremony-card bg-[#faf8f5] border-2 border-dashed border-[#c5a880]/30 rounded-2xl p-6 max-w-md mx-auto space-y-2">
-            <h3 className="font-serif text-[#8a5a2a] font-bold text-lg">LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH</h3>
-            <p className="ceremony-time text-xs font-bold text-slate-600">VÀO LÚC {card.ceremony_time || '09:00 SÁNG'}</p>
-            <p className="ceremony-date text-sm font-serif font-bold text-[#8a5a2a]">{formattedDate}</p>
-            <p className="lunar-date text-[10px] text-slate-400 italic">Mời quý khách đến chung vui cùng gia đình</p>
+        <section className="ceremony-details">
+          <div className="ceremony-card">
+            <h3>LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH</h3>
+            <p className="ceremony-time">VÀO LÚC {card.ceremony_time || '09:00 SÁNG'}</p>
+            <p className="ceremony-date">{formattedDate}</p>
+            <p className="lunar-date">Mời quý khách đến chung vui cùng gia đình</p>
           </div>
         </section>
 
         {/* Gallery Album */}
         {card.album_images && card.album_images.length > 0 && (
-          <section className="gallery py-12 px-6">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+          <section className="gallery">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">ALBUM ẢNH CƯỚI</h2>
+              <h2 className="section-title">ALBUM ẢNH CƯỚI</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Tình yêu ngọt ngào qua những khung hình</p>
-            <div className="gallery-grid grid grid-cols-2 gap-4 max-w-md mx-auto">
+            <p className="section-subtitle">Tình yêu ngọt ngào qua những khung hình</p>
+            <div className="gallery-grid">
               {card.album_images.map((imgUrl, i) => (
                 <div
                   key={i}
-                  className="gallery-item overflow-hidden rounded-xl shadow-sm border border-slate-100 cursor-zoom-in"
+                  className="gallery-item cursor-zoom-in"
                   onClick={() => setLightboxImg(imgUrl)}
                 >
                   <img
                     src={imgUrl}
                     alt={`Album wedding ${i + 1}`}
-                    className="gallery-img w-full h-44 object-cover transition hover:scale-[1.02] duration-300"
+                    className="gallery-img"
                   />
                 </div>
               ))}
@@ -403,55 +408,55 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
         )}
 
         {/* Wedding Party Info Section */}
-        <section className="party-info py-12 px-6 bg-[#faf8f5]/65 border-t border-b border-[#c5a880]/20 text-center">
-          <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+        <section className="party-info">
+          <div className="section-title-wrapper">
             <span className="ornament-icon">❦</span>
-            <h2 className="section-title font-serif text-lg font-bold text-slate-800">THÔNG TIN TIỆC CƯỚI</h2>
+            <h2 className="section-title">THÔNG TIN TIỆC CƯỚI</h2>
             <span className="ornament-icon">❦</span>
           </div>
-          <p className="party-intro-text text-xs text-slate-500">Tiệc cưới được diễn ra tại:</p>
+          <p className="party-intro-text">Tiệc cưới được diễn ra tại:</p>
           
-          <div className="party-time-badge inline-flex items-center gap-2.5 bg-[#8a5a2a] text-white font-bold py-2.5 px-6 rounded-full text-xs tracking-widest mt-4 shadow-sm">
+          <div className="party-time-badge">
             <span className="time">{card.ceremony_time || '11:30'}</span>
             <span className="divider">|</span>
             <span className="date">{card.event_date ? new Date(card.event_date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '00/00/0000'}</span>
           </div>
 
           {/* Countdown Widget */}
-          <div className="countdown-section mt-8">
-            <h3 className="widget-title text-[10px] tracking-widest font-bold text-slate-400 uppercase mb-4">CÙNG ĐẾM NGƯỢC</h3>
-            <div className="countdown-container flex justify-center gap-3">
-              <div className="countdown-item bg-white border border-[#c5a880]/30 text-[#8a5a2a] p-3 rounded-xl min-w-[65px] shadow-sm">
-                <span className="block font-bold text-xl">{timeLeft.days.toString().padStart(2, '0')}</span>
-                <small className="text-[10px] text-slate-400">Ngày</small>
+          <div className="countdown-section">
+            <h3 className="widget-title">CÙNG ĐẾM NGƯỢC</h3>
+            <div className="countdown-container">
+              <div className="countdown-item">
+                <span>{timeLeft.days.toString().padStart(2, '0')}</span>
+                <small>Ngày</small>
               </div>
-              <div className="countdown-item bg-white border border-[#c5a880]/30 text-[#8a5a2a] p-3 rounded-xl min-w-[65px] shadow-sm">
-                <span className="block font-bold text-xl">{timeLeft.hours.toString().padStart(2, '0')}</span>
-                <small className="text-[10px] text-slate-400">Giờ</small>
+              <div className="countdown-item">
+                <span>{timeLeft.hours.toString().padStart(2, '0')}</span>
+                <small>Giờ</small>
               </div>
-              <div className="countdown-item bg-white border border-[#c5a880]/30 text-[#8a5a2a] p-3 rounded-xl min-w-[65px] shadow-sm">
-                <span className="block font-bold text-xl">{timeLeft.minutes.toString().padStart(2, '0')}</span>
-                <small className="text-[10px] text-slate-400">Phút</small>
+              <div className="countdown-item">
+                <span>{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                <small>Phút</small>
               </div>
-              <div className="countdown-item bg-white border border-[#c5a880]/30 text-[#8a5a2a] p-3 rounded-xl min-w-[65px] shadow-sm">
-                <span className="block font-bold text-xl">{timeLeft.seconds.toString().padStart(2, '0')}</span>
-                <small className="text-[10px] text-slate-400">Giây</small>
+              <div className="countdown-item">
+                <span>{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                <small>Giây</small>
               </div>
             </div>
           </div>
 
           {/* Venue details */}
-          <div className="venue-details mt-10 space-y-2">
-            <h3 className="font-bold text-slate-800 text-base font-serif">{card.venue_name}</h3>
-            <p className="venue-address text-xs text-slate-500 max-w-sm mx-auto flex items-center justify-center gap-1"><MapPin size={12} className="text-[#8a5a2a]" /> {card.venue_address}</p>
+          <div className="venue-details">
+            <h3>ĐỊA ĐIỂM TIỆC CƯỚI</h3>
+            <h2 className="venue-name">{card.venue_name}</h2>
+            <p className="venue-address">{card.venue_address}</p>
             
             {card.map_url && (
-              <div className="map-container mt-6 overflow-hidden rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto h-64">
+              <div className="map-container">
                 <iframe
                   src={getMapIframeSrc(card)}
                   allowFullScreen
                   loading="lazy"
-                  className="w-full h-full border-none"
                   title="Google Maps"
                 />
               </div>
@@ -461,14 +466,14 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
         {/* Dresscode suggestions */}
         {card.plan_id !== 'basic' && card.dress_code && (
-          <section className="dress-code py-12 px-6 text-center bg-white">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+          <section className="dress-code">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">DRESS CODE</h2>
+              <h2 className="section-title">DRESS CODE</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-6">Trang phục gợi ý dự tiệc</p>
-            <div className="dress-colors flex justify-center gap-4 items-center">
+            <p className="section-subtitle">Trang phục gợi ý dự tiệc</p>
+            <div className="dress-colors">
               {card.dress_code.split(',').map((colorText, i) => {
                 const cleanText = colorText.trim();
                 let bgStyle = '#dfb279';
@@ -478,33 +483,35 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
                 else if (cleanText.toLowerCase().includes('nâu')) bgStyle = '#8a5a2a';
 
                 return (
-                  <div key={i} className="color-item flex flex-col items-center gap-1">
-                    <div className="color-circle h-10 w-10 rounded-full border border-slate-350 shadow-sm" style={{ backgroundColor: bgStyle }}></div>
-                    <span className="text-[10px] font-semibold text-slate-500">{cleanText}</span>
+                  <div key={i} className="color-item">
+                    <div className="color-circle" style={{ backgroundColor: bgStyle }}></div>
+                    <span>{cleanText}</span>
                   </div>
                 );
               })}
             </div>
-            <p className="dress-code-note text-[10px] text-slate-400 mt-4 max-w-xs mx-auto">Tone trang phục đồng điệu mang đến những kỷ niệm hình ảnh đẹp nhất</p>
+            <p className="dress-code-note">Tone trang phục đồng điệu mang đến những kỷ niệm hình ảnh đẹp nhất</p>
           </section>
         )}
 
         {/* Timeline details */}
         {card.has_schedule && card.wedding_schedule && card.wedding_schedule.length > 0 && (
-          <section className="timeline-section py-12 px-6 bg-[#faf8f5]/40 border-t border-[#c5a880]/20">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-8 text-center">
+          <section className="timeline-section">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">LỊCH TRÌNH TIỆC CƯỚI</h2>
+              <h2 className="section-title">LỊCH TRÌNH TIỆC CƯỚI</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <div className="timeline-container relative max-w-md mx-auto pl-8">
-              <div className="timeline-line absolute left-3 top-2 bottom-2 w-0.5 bg-[#c5a880]"></div>
+            <div className="timeline-container">
+              <div className="timeline-line"></div>
               {card.wedding_schedule.map((item, index) => (
-                <div key={index} className="timeline-item relative space-y-1 mb-6 text-left">
-                  <div className="absolute -left-[25px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#8a5a2a] shadow-sm"></div>
-                  <div className="timeline-time text-xs font-bold text-[#8a5a2a]">{item.time}</div>
-                  <h4 className="font-bold text-slate-800 text-sm">{item.title}</h4>
-                  {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
+                <div key={index} className="timeline-item">
+                  <div className="timeline-time">{item.time}</div>
+                  <div className="timeline-badge"></div>
+                  <div className="timeline-content">
+                    <h4>{item.title}</h4>
+                    {item.description && <p>{item.description}</p>}
+                  </div>
                 </div>
               ))}
             </div>
@@ -513,13 +520,13 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
         {/* RSVP Section */}
         {card.plan_id !== 'basic' && (
-          <section className="rsvp py-12 px-6 border-t border-[#c5a880]/20" id="rsvp-section">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+          <section className="rsvp" id="rsvp-section">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">XÁC NHẬN THAM DỰ</h2>
+              <h2 className="section-title">XÁC NHẬN THAM DỰ</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Vui lòng phản hồi trước để chúng tôi chuẩn bị đón tiếp chu đáo nhất</p>
+            <p className="section-subtitle">Vui lòng phản hồi trước để chúng tôi chuẩn bị đón tiếp chu đáo nhất</p>
 
             {rsvpSuccess ? (
               <div className="py-8 text-center text-green-600 font-bold text-sm bg-green-50 border border-green-200 rounded-2xl max-w-md mx-auto">
@@ -527,51 +534,46 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
                 <p>Cảm ơn bạn đã phản hồi tham dự!</p>
               </div>
             ) : (
-              <form onSubmit={handleRsvpSubmit} className="rsvp-form bg-white border border-[#c5a880]/30 p-6 rounded-2xl shadow-sm space-y-4 max-w-md mx-auto text-left">
-                <div className="form-group flex flex-col">
-                  <label className="text-xs font-semibold text-slate-700 mb-1">Họ và tên của bạn *</label>
+              <form onSubmit={handleRsvpSubmit} className="rsvp-form">
+                <div className="form-group">
+                  <label>Họ và tên của bạn *</label>
                   <input
                     type="text"
                     required
                     placeholder="Nhập họ tên..."
-                    className="p-3 rounded-lg border border-slate-200 focus:outline-[#8a5a2a] bg-slate-50 text-sm"
                     value={rsvpName}
                     onChange={(e) => setRsvpName(e.target.value)}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="form-group flex flex-col">
-                    <label className="text-xs font-semibold text-slate-700 mb-1">Bạn sẽ tham dự chứ? *</label>
-                    <select
-                      className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
-                      value={rsvpStatus}
-                      onChange={(e) => setRsvpStatus(e.target.value)}
-                    >
-                      <option value="yes">Chắc chắn tham gia</option>
-                      <option value="no">Tiếc quá, vắng mặt</option>
-                    </select>
-                  </div>
+                <div className="form-group">
+                  <label>Bạn sẽ tham dự chứ? *</label>
+                  <select
+                    value={rsvpStatus}
+                    onChange={(e) => setRsvpStatus(e.target.value)}
+                  >
+                    <option value="yes">Chắc chắn tham gia</option>
+                    <option value="no">Tiếc quá, vắng mặt</option>
+                  </select>
+                </div>
 
-                  <div className="form-group flex flex-col">
-                    <label className="text-xs font-semibold text-slate-700 mb-1">Số người đi cùng</label>
-                    <select
-                      className="p-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:outline-[#8a5a2a]"
-                      value={rsvpCount}
-                      onChange={(e) => setRsvpCount(Number(e.target.value))}
-                    >
-                      <option value={0}>Đi một mình</option>
-                      <option value={1}>1 người đi cùng</option>
-                      <option value={2}>2 người đi cùng</option>
-                      <option value={3}>3 người đi cùng</option>
-                    </select>
-                  </div>
+                <div className="form-group">
+                  <label>Số người đi cùng</label>
+                  <select
+                    value={rsvpCount}
+                    onChange={(e) => setRsvpCount(Number(e.target.value))}
+                  >
+                    <option value={0}>Đi một mình</option>
+                    <option value={1}>1 người đi cùng</option>
+                    <option value={2}>2 người đi cùng</option>
+                    <option value={3}>3 người đi cùng</option>
+                  </select>
                 </div>
 
                 <button
                   type="submit"
                   disabled={rsvpSubmitting}
-                  className="w-full bg-[#8a5a2a] hover:bg-[#704820] text-white font-bold py-3.5 rounded-lg text-sm transition shadow flex items-center justify-center gap-1.5"
+                  className="btn-submit flex items-center justify-center gap-1.5"
                 >
                   {rsvpSubmitting ? (
                     <RefreshCw className="animate-spin" size={16} />
@@ -586,22 +588,22 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
         {/* Guestbook Section */}
         {card.plan_id !== 'basic' && (
-          <section className="guestbook py-12 px-6 bg-[#faf8f5]/40 border-t border-b border-[#c5a880]/20">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+          <section className="guestbook">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">GỬI LỜI CHÚC MỪNG</h2>
+              <h2 className="section-title">GỬI LỜI CHÚC MỪNG</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Để lại những lời chúc ngọt ngào nhất gửi đến cô dâu & chú rể</p>
+            <p className="section-subtitle">Để lại những lời chúc ngọt ngào nhất gửi đến cô dâu & chú rể</p>
 
-            <div className="wishes-list space-y-3 max-w-md mx-auto max-h-60 overflow-y-auto mb-6 pr-2">
+            <div className="guestbook-list">
               {loadingWishes ? (
                 <p className="text-center text-xs text-slate-400">Đang tải...</p>
               ) : wishes.length > 0 ? (
                 wishes.map((wish) => (
-                  <div key={wish.id} className="wish-item bg-white border border-[#c5a880]/30 p-4 rounded-xl shadow-sm text-left">
-                    <strong className="text-[#8a5a2a] text-sm block font-bold">{wish.guest_name}</strong>
-                    <p className="text-slate-650 text-xs mt-1 leading-relaxed">{wish.message}</p>
+                  <div key={wish.id} className="wish-item">
+                    <strong>{wish.guest_name}</strong>
+                    <p>{wish.message}</p>
                   </div>
                 ))
               ) : (
@@ -610,31 +612,35 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
             </div>
 
             {wishSuccess ? (
-              <div className="text-center py-4 bg-green-50 text-green-600 rounded-xl text-xs max-w-md mx-auto border border-green-200">
+              <div className="text-center py-4 bg-green-50 text-green-600 rounded-xl text-xs max-w-md mx-auto border border-green-200 mt-6">
                 <p>✓ Cảm ơn bạn đã gửi lời chúc mừng!</p>
               </div>
             ) : (
-              <form onSubmit={handleWishSubmit} className="wish-form space-y-3 max-w-md mx-auto text-left">
-                <input
-                  type="text"
-                  required
-                  placeholder="Tên của bạn..."
-                  className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-sm focus:outline-[#8a5a2a]"
-                  value={wishName}
-                  onChange={(e) => setWishName(e.target.value)}
-                />
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Nhập lời chúc tốt đẹp nhất gửi đến cô dâu & chú rể..."
-                  className="w-full p-2.5 rounded-lg border border-slate-200 bg-white text-sm focus:outline-[#8a5a2a]"
-                  value={wishText}
-                  onChange={(e) => setWishText(e.target.value)}
-                />
+              <form onSubmit={handleWishSubmit} className="wish-form mt-6">
+                <div className="form-group">
+                  <label>Tên của bạn *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Tên của bạn..."
+                    value={wishName}
+                    onChange={(e) => setWishName(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Lời chúc *</label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Nhập lời chúc tốt đẹp nhất gửi đến cô dâu & chú rể..."
+                    value={wishText}
+                    onChange={(e) => setWishText(e.target.value)}
+                  />
+                </div>
                 <button
                   type="submit"
                   disabled={wishSubmitting}
-                  className="w-full bg-[#8a5a2a] hover:bg-[#704820] text-white font-bold py-2.5 rounded-lg text-xs transition"
+                  className="btn-submit-wish"
                 >
                   {wishSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'}
                 </button>
@@ -645,66 +651,71 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
 
         {/* Gift registry Box mừng cưới Trigger Button */}
         {(card.groom_bank_account || card.bride_bank_account) && (
-          <section className="gifts py-12 px-6 text-center">
-            <div className="section-title-wrapper flex items-center justify-center gap-2 mb-2">
+          <section className="gifts">
+            <div className="section-title-wrapper">
               <span className="ornament-icon">❦</span>
-              <h2 className="section-title font-serif text-lg font-bold text-slate-800">PHONG BAO MỪNG CƯỚI</h2>
+              <h2 className="section-title">PHONG BAO MỪNG CƯỚI</h2>
               <span className="ornament-icon">❦</span>
             </div>
-            <p className="section-subtitle text-center text-xs text-slate-400 italic mb-8">Mọi lời chúc mừng và quà tặng đều được trân quý ghi nhận</p>
+            <p className="section-subtitle">Mọi lời chúc mừng và quà tặng đều được trân quý ghi nhận</p>
 
-            <button
-              onClick={() => setShowGiftModal(true)}
-              className="gift-envelope-btn flex flex-col items-center justify-center bg-[#faf8f5] hover:bg-[#eae6e0] border border-dashed border-[#c5a880]/40 p-6 rounded-2xl max-w-xs mx-auto shadow-sm transition w-full"
-            >
-              <div className="envelope-character text-2xl text-[#8a5a2a] animate-bounce"><Heart className="fill-[#8a5a2a]/20" /></div>
-              <span className="text-xs font-bold text-slate-700 mt-2">Nhấn để mở phong bao mừng cưới</span>
-            </button>
+            <div className="flex justify-center mt-6 w-full">
+              <div className="max-w-xs w-full">
+                <button
+                  onClick={() => setShowGiftModal(true)}
+                  className="gift-envelope-btn"
+                >
+                  <div className="envelope-character">
+                    <Heart className="fill-current" size={24} />
+                  </div>
+                  <span>Nhấn để mở phong bao mừng cưới</span>
+                </button>
+              </div>
+            </div>
           </section>
         )}
 
         {/* Footer */}
-        <footer className="wedding-footer text-center py-12 border-t border-slate-100 mt-12 bg-white px-4">
-          <p className="footer-thank text-center italic font-serif text-slate-500 text-sm mx-auto px-4">
+        <footer className="wedding-footer">
+          <p className="footer-thank">
             {card.thank_you_text || 'Sự hiện diện của quý khách là niềm vinh hạnh lớn cho hai bên gia đình chúng tôi!'}
           </p>
-            <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link text-[10px] text-slate-400 hover:text-[#8a5a2a] block mt-6 font-semibold">
-              ❦ loobycard.com
-            </a>
+          <a href="https://loobycard.com" target="_blank" rel="noopener noreferrer" className="footer-link">
+            ❦ loobycard.com
+          </a>
         </footer>
 
         <img src="/assets/images/template-15/hoa.webp" className="bg-decor-bottom" alt="" />
       </div>
 
+
       {/* Gift Registry Modal Overlay */}
       {showGiftModal && (
-        <div className="gift-modal-overlay active fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowGiftModal(false); }}>
-          <div className="gift-modal-card bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[85vh] overflow-y-auto">
+        <div className="gift-modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) setShowGiftModal(false); }}>
+          <div className="gift-modal-card">
             <button
               onClick={() => setShowGiftModal(false)}
-              className="gift-modal-close absolute top-4 right-4 text-2xl font-bold text-slate-400 hover:text-slate-600 h-8 w-8 flex items-center justify-center bg-slate-100 rounded-full"
+              className="gift-modal-close"
             >
               ×
             </button>
-            <h3 className="modal-title font-serif text-xl font-bold text-center text-slate-800 mb-6">Thông Tin Mừng Cưới</h3>
+            <h3 className="modal-title">Thông Tin Mừng Cưới</h3>
             
-            <div className="bank-accounts-grid grid grid-cols-1 gap-6">
+            <div className="bank-accounts-grid">
               {card.groom_bank_account && (
-                <div className="bank-card bg-slate-50 border border-[#c5a880]/30 rounded-2xl p-4 text-center">
-                  <div className="bank-card-header bg-[#8a5a2a] text-white text-[10px] font-bold py-1 px-3 rounded-full inline-block mb-3">
+                <div className="bank-card">
+                  <div className="bank-card-header">
                     CHÚ RỂ
                   </div>
-                  <h4 className="account-name font-serif font-bold text-[#8a5a2a] text-base">{card.groom_bank_holder}</h4>
-                  <p className="bank-info text-xs text-slate-400 mt-1">{card.groom_bank_name}</p>
-                  <p className="account-number font-mono text-sm font-bold text-slate-850 mt-1">Số TK: <strong>{card.groom_bank_account}</strong></p>
+                  <h4 className="account-name">{card.groom_bank_holder}</h4>
+                  <p className="bank-info">{card.groom_bank_name}</p>
+                  <p className="account-number">Số TK: {card.groom_bank_account}</p>
                   {getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder) && (
-                    <div className="qr-code mt-3 bg-white p-2 border border-slate-200 rounded-xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner">
+                    <div className="qr-code">
                       <img
                         src={getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder)}
                         alt="Groom Bank QR"
                         onClick={() => setLightboxImg(getQR(card.groom_bank_name, card.groom_bank_account, card.groom_bank_holder))}
-                        className="w-full h-full object-contain cursor-zoom-in"
-                        style={{ cursor: 'zoom-in' }}
                       />
                     </div>
                   )}
@@ -712,21 +723,19 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
               )}
 
               {card.bride_bank_account && (
-                <div className="bank-card bg-slate-50 border border-[#c5a880]/30 rounded-2xl p-4 text-center">
-                  <div className="bank-card-header bg-[#8a5a2a] text-white text-[10px] font-bold py-1 px-3 rounded-full inline-block mb-3">
+                <div className="bank-card">
+                  <div className="bank-card-header">
                     CÔ DÂU
                   </div>
-                  <h4 className="account-name font-serif font-bold text-[#8a5a2a] text-base">{card.bride_bank_holder}</h4>
-                  <p className="bank-info text-xs text-slate-400 mt-1">{card.bride_bank_name}</p>
-                  <p className="account-number font-mono text-sm font-bold text-slate-850 mt-1">Số TK: <strong>{card.bride_bank_account}</strong></p>
+                  <h4 className="account-name">{card.bride_bank_holder}</h4>
+                  <p className="bank-info">{card.bride_bank_name}</p>
+                  <p className="account-number">Số TK: {card.bride_bank_account}</p>
                   {getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder) && (
-                    <div className="qr-code mt-3 bg-white p-2 border border-slate-200 rounded-xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner">
+                    <div className="qr-code">
                       <img
                         src={getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder)}
                         alt="Bride Bank QR"
                         onClick={() => setLightboxImg(getQR(card.bride_bank_name, card.bride_bank_account, card.bride_bank_holder))}
-                        className="w-full h-full object-contain cursor-zoom-in"
-                        style={{ cursor: 'zoom-in' }}
                       />
                     </div>
                   )}
@@ -740,12 +749,12 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
       {/* Photo Lightbox Modal Overlay */}
       {lightboxImg && (
         <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-4"
+          className="fixed inset-0 z-[100001] flex items-center justify-center bg-black/90 p-4"
           id="lightbox"
           onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}
         >
           <button
-            className="absolute right-5 top-5 z-[81] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-3xl leading-none text-white transition hover:bg-white/20"
+            className="absolute right-5 top-5 z-[100002] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-3xl leading-none text-white transition hover:bg-white/20"
             id="lightbox-close"
             onClick={() => setLightboxImg(null)}
           >

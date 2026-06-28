@@ -4,6 +4,83 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Check, X, ArrowRight, Menu, X as CloseIcon, Laptop, Star } from 'lucide-react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+
+function TypingText({ text, speed = 120, delay = 500 }: { text: string; speed?: number; delay?: number }) {
+  const [started, setStarted] = useState(false);
+  const [count, setCount] = useState(0);
+  const chars = React.useMemo(() => Array.from(text.normalize('NFC')), [text]);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => {
+      setStarted(true);
+    }, delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (started && count < chars.length) {
+      const typingTimer = setTimeout(() => {
+        setCount((prev) => prev + 1);
+      }, speed);
+      return () => clearTimeout(typingTimer);
+    }
+  }, [started, count, chars.length, speed]);
+
+  const displayedText = chars.slice(0, count).join('');
+  const isTypingComplete = started && count >= chars.length;
+
+  return (
+    <span className="inline-flex items-center">
+      {displayedText}
+      {!isTypingComplete && (
+        <span className="ml-1 inline-block w-[2.5px] h-[1.1em] bg-white animate-pulse" />
+      )}
+    </span>
+  );
+}
+
+function ScrollReveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -80px 0px',
+      }
+    );
+
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -106,9 +183,11 @@ export default function HomePage() {
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center" style={{ zIndex: 1 }}>
           {/* Heading */}
-          <h1 className="font-extrabold text-secondary tracking-tight mb-6" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-            <span className="font-serif font-light italic">Bắt đầu khoảnh khắc đặc biệt bằng một</span>{' '}
-            <span className="text-white px-3 py-1 rounded-lg font-bold not-italic" style={{ backgroundColor: '#8FB8ED', display: 'inline-block' }}>lời mời tinh tế.</span>
+          <h1 className="font-extrabold text-secondary tracking-tight mb-6" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+            <span className="font-serif font-light italic block mb-3">Bắt đầu khoảnh khắc đặc biệt bằng một</span>
+            <span className="text-white px-3 py-1 rounded-lg font-bold not-italic" style={{ backgroundColor: '#8FB8ED', display: 'inline-block' }}>
+              <TypingText text="lời mời tinh tế." />
+            </span>
           </h1>
 
           {/* Description */}
@@ -147,7 +226,7 @@ export default function HomePage() {
 
       {/* Features Zigzag */}
       <section id="features" className="py-20 bg-brand-bg-alt">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-secondary tracking-tight">Mọi tính năng bạn cần cho một đám cưới hoàn hảo</h2>
             <p className="text-brand-text-light mt-4 text-base sm:text-lg">Từ khâu thiết kế đến quản lý phản hồi, hệ thống loobycard tự động hóa giúp giảm bớt gánh nặng chuẩn bị.</p>
@@ -221,12 +300,12 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Featured Template Highlight */}
       <section id="templates" className="py-20 bg-white border-t border-b border-brand-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl font-extrabold text-secondary tracking-tight">Mẫu thiệp cưới nổi bật</h2>
@@ -296,12 +375,12 @@ export default function HomePage() {
               Xem tất cả mẫu <ArrowRight size={16} />
             </Link>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Guide / How it Works */}
       <section id="how-it-works" className="py-20 bg-secondary text-white relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-serif">Chỉ 3 bước đơn giản</h2>
             <p className="text-slate-400 mt-4">Tạo trang web thiệp cưới chưa bao giờ dễ dàng đến thế.</p>
@@ -335,12 +414,12 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-brand-bg-alt">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-secondary tracking-tight">Bảng giá minh bạch</h2>
             <p className="text-brand-text-light mt-4 text-base sm:text-lg">Gói cước linh hoạt phù hợp với mọi nhu cầu.</p>
@@ -437,12 +516,12 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-primary-light/40 border-t border-brand-border center text-center">
-        <div className="max-w-4xl mx-auto px-4 space-y-6">
+        <ScrollReveal className="max-w-4xl mx-auto px-4 space-y-6">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-secondary tracking-tight">Bạn đã sẵn sàng tạo bất ngờ cho khách mời?</h2>
           <p className="text-brand-text-light text-base sm:text-lg">
             Hàng ngàn thiệp cưới độc đáo đã được tạo ra. Đến lượt bạn rồi!
@@ -452,7 +531,7 @@ export default function HomePage() {
               Chọn thiệp ngay <ArrowRight size={20} />
             </Link>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Footer (Premium matching original website layout) */}

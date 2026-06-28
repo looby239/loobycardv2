@@ -227,6 +227,33 @@
     opacity: 0.6;
   }
 
+  /* --- Ambient Floating Particles --- */
+  .particles-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    top: -40px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 5;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    color: #ffb7c5;
+    animation: ambient-fall 10s ease-in-out infinite;
+  }
+
+  .particle:nth-child(1) { animation-duration: 9s; --sway: 40px; }
+  .particle:nth-child(2) { animation-duration: 12s; --sway: -60px; }
+  .particle:nth-child(3) { animation-duration: 10s; --sway: 50px; }
+  .particle:nth-child(4) { animation-duration: 14s; --sway: -40px; }
+  .particle:nth-child(5) { animation-duration: 11s; --sway: 30px; }
+
   /* --- Envelope Cover Overlay --- */
   .envelope-overlay {
     position: fixed;

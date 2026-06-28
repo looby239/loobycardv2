@@ -278,11 +278,11 @@ export default function Template18({ card, previewMode = false }: TemplateProps)
       <div className={`envelope-overlay ${opened ? 'open' : ''}`} id="envelope-overlay">
         {/* Ambient floating particles */}
         <div className="particles-container" id="particles-container">
-          <div className="particle" style={{ left: '10%', animationDelay: '0s' }}>✨</div>
-          <div className="particle" style={{ left: '30%', animationDelay: '2s' }}>✨</div>
-          <div className="particle" style={{ left: '50%', animationDelay: '4s' }}>✨</div>
-          <div className="particle" style={{ left: '70%', animationDelay: '1s' }}>✨</div>
-          <div className="particle" style={{ left: '90%', animationDelay: '3s' }}>✨</div>
+          <div className="particle" style={{ left: '10%', animationDelay: '0s' }}>🌸</div>
+          <div className="particle" style={{ left: '30%', animationDelay: '2s' }}>🌸</div>
+          <div className="particle" style={{ left: '50%', animationDelay: '4s' }}>🌸</div>
+          <div className="particle" style={{ left: '70%', animationDelay: '1s' }}>🌸</div>
+          <div className="particle" style={{ left: '90%', animationDelay: '3s' }}>🌸</div>
         </div>
 
         <div className="envelope-card">

@@ -32,8 +32,10 @@ function TypingText({ text, speed = 120, delay = 500 }: { text: string; speed?: 
   return (
     <span className="inline-flex items-center">
       {displayedText}
-      {!isTypingComplete && (
+      {!isTypingComplete ? (
         <span className="ml-1 inline-block w-[2.5px] h-[1.1em] bg-white animate-pulse" />
+      ) : (
+        <span className="ml-1.5 inline-block animate-heartbeat text-white select-none">❤︎</span>
       )}
     </span>
   );
@@ -186,7 +188,7 @@ export default function HomePage() {
           <h1 className="font-extrabold text-secondary tracking-tight mb-6" style={{ fontSize: 'clamp(2.4rem, 5vw, 4rem)', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
             <span className="font-serif font-light italic block mb-3">Bắt đầu khoảnh khắc đặc biệt bằng một</span>
             <span className="text-white px-3 py-1 rounded-lg font-bold not-italic" style={{ backgroundColor: '#8FB8ED', display: 'inline-block' }}>
-              <TypingText text="lời mời tinh tế." />
+              <TypingText text="lời mời tinh tế" />
             </span>
           </h1>
 

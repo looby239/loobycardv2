@@ -595,8 +595,9 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
               <div className="form-group">
                 <textarea id="wish-text" rows={3} placeholder="Nhập lời chúc của bạn gửi cô dâu &amp; chú rể... *" required value={wishText} onChange={(e) => setWishText(e.target.value)}></textarea>
               </div>
-              <button type="submit" className="btn-submit-wish" disabled={wishSubmitting}>
-                {wishSubmitting ? 'Đang Gửi...' : 'Gửi Lời Chúc'}
+              <button type="submit" className="btn-submit" disabled={wishSubmitting}>
+                <span>{wishSubmitting ? 'Đang Gửi...' : 'Gửi Lời Chúc'}</span>
+                <div className="btn-shine"></div>
               </button>
             </form>
 

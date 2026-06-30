@@ -75,6 +75,35 @@ async function ensureTemplateRows() {
   if (error) {
     console.error('ensureTemplateRows error:', error);
   }
+
+  // Migrate old defaults to new correct thumbnails if not customized by admin
+  try {
+    await supabaseAdmin
+      .from('template_configs')
+      .update({ thumbnail_url: '/assets/images/template-10-thumbnail.png' })
+      .eq('id', 'template-10')
+      .eq('thumbnail_url', '/templates/template-10/assets/images/cover_photo.png');
+
+    await supabaseAdmin
+      .from('template_configs')
+      .update({ thumbnail_url: '/assets/images/template-11-thumbnail.png' })
+      .eq('id', 'template-11')
+      .eq('thumbnail_url', '/assets/images/template-11/preview.png');
+
+    await supabaseAdmin
+      .from('templates')
+      .update({ thumbnail_url: '/assets/images/template-10-thumbnail.png' })
+      .eq('id', 'template-10')
+      .eq('thumbnail_url', '/templates/template-10/assets/images/cover_photo.png');
+
+    await supabaseAdmin
+      .from('templates')
+      .update({ thumbnail_url: '/assets/images/template-11-thumbnail.png' })
+      .eq('id', 'template-11')
+      .eq('thumbnail_url', '/assets/images/template-11/preview.png');
+  } catch (migrateErr) {
+    console.warn('ensureTemplateRows migration warning:', migrateErr);
+  }
 }
 
 async function mirrorTemplateRow(row: {

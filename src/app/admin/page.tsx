@@ -591,6 +591,12 @@ export default function AdminCardsPage() {
           >
             Test template
           </Link>
+          <Link
+            href="/admin/template-lab"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition"
+          >
+            Template Catalog
+          </Link>
         </div>
 
         {/* Tab Filters */}

@@ -17,7 +17,7 @@ export const TEMPLATE_CATALOG: TemplateCatalogItem[] = [
     description: 'Phong cach A Dong truyen thong, mau do son va vang ruc ro',
     type: 'thiep-cuoi',
     typeName: 'Thiep cuoi',
-    defaultThumbnail: '/templates/template-10/assets/images/cover_photo.png',
+    defaultThumbnail: '/assets/images/template-10-thumbnail.png',
     previewUrl: '/template-preview/template-10',
   },
   {
@@ -27,7 +27,7 @@ export const TEMPLATE_CATALOG: TemplateCatalogItem[] = [
     description: 'Nhe nhang, lang man voi sac trang va hoa mai',
     type: 'thiep-cuoi',
     typeName: 'Thiep cuoi',
-    defaultThumbnail: '/assets/images/template-11/preview.png',
+    defaultThumbnail: '/assets/images/template-11-thumbnail.png',
     previewUrl: '/template-preview/template-11',
   },
   {

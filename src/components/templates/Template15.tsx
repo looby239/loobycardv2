@@ -7,6 +7,7 @@ import { Heart, Volume2, VolumeX, MailOpen, MapPin, Check, RefreshCw } from 'luc
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-15.css';
+import Lightbox from './Lightbox';
 
 interface TemplateProps {
   card: CardData;
@@ -222,6 +223,11 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
         year: 'numeric',
       })
     : 'Chưa cập nhật';
+
+  const lightboxImages = [
+    card.cover_image_url,
+    ...(card.album_images || []),
+  ].filter(Boolean) as string[];
 
   return (
     <div className="t15-wrapper min-h-screen bg-[#faf8f5] relative overflow-x-hidden text-slate-800">
@@ -747,24 +753,12 @@ export default function Template15({ card, previewMode = false }: TemplateProps)
       )}
 
       {/* Photo Lightbox Modal Overlay */}
-      {lightboxImg && (
-        <div
-          className="fixed inset-0 z-[100001] flex items-center justify-center bg-black/90 p-4"
-          id="lightbox"
-          onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}
-        >
-          <button
-            className="absolute right-5 top-5 z-[100002] flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-3xl leading-none text-white transition hover:bg-white/20"
-            id="lightbox-close"
-            onClick={() => setLightboxImg(null)}
-          >
-            ×
-          </button>
-          <div className="flex max-h-[90vh] max-w-[92vw] items-center justify-center">
-            <img src={lightboxImg} alt="Photo Fullscreen" className="max-h-[90vh] max-w-full object-contain shadow-2xl" id="lightbox-img" />
-          </div>
-        </div>
-      )}
+      <Lightbox
+        currentImage={lightboxImg}
+        images={lightboxImages}
+        onClose={() => setLightboxImg(null)}
+        onNavigate={setLightboxImg}
+      />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { buildVietQrUrl } from '@/lib/vietqr';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-13.css';
+import Lightbox from './Lightbox';
 
 interface TemplateProps {
   card: CardData;
@@ -277,6 +278,8 @@ export default function Template13({ card, previewMode = false }: TemplateProps)
   ] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
+
+  const lightboxImages = albumImages;
 
   return (
     <div className="t13-wrapper">
@@ -710,14 +713,12 @@ export default function Template13({ card, previewMode = false }: TemplateProps)
       )}
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
-      {lightboxImg && (
-        <div className="lightbox-overlay active" id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}>
-          <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)}>×</button>
-          <div className="lightbox-content">
-            <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" />
-          </div>
-        </div>
-      )}
+      <Lightbox
+        currentImage={lightboxImg}
+        images={lightboxImages}
+        onClose={() => setLightboxImg(null)}
+        onNavigate={setLightboxImg}
+      />
     </div>
   );
 }

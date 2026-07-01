@@ -6,6 +6,7 @@ import { buildVietQrUrl } from '@/lib/vietqr';
 import { supabase } from '@/lib/supabase';
 import { CardData } from '@/types/card';
 import '@/styles/templates/template-12.css';
+import Lightbox from './Lightbox';
 
 interface TemplateProps {
   card: CardData;
@@ -252,6 +253,8 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
   ] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
+
+  const lightboxImages = albumImages;
 
   return (
     <div className="t12-wrapper">
@@ -693,15 +696,12 @@ export default function Template12({ card, previewMode = false }: TemplateProps)
       )}
 
       {/* Photo Lightbox Modal Overlay (For Album click) */}
-      {lightboxImg && (
-        <div className="lightbox-overlay active" id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }} style={{ display: 'flex', position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 1000, justifyContent: 'center', alignItems: 'center' }}>
-          <button className="lightbox-close" id="lightbox-close" onClick={() => setLightboxImg(null)} style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', fontSize: '30px', background: 'transparent', border: 'none', cursor: 'pointer' }}>×</button>
-          <div className="lightbox-content" style={{ maxWidth: '90vw', maxHeight: '90vh' }}>
-            <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }} />
-            {/* Simple nav hidden for now since we just display the clicked image */}
-          </div>
-        </div>
-      )}
+      <Lightbox
+        currentImage={lightboxImg}
+        images={lightboxImages}
+        onClose={() => setLightboxImg(null)}
+        onNavigate={setLightboxImg}
+      />
 
     </div>
   );

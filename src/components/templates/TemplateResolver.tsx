@@ -171,18 +171,10 @@ function ConfiguredTemplateShell({
         .template-config-scope.template-gallery-grid .album-grid,
         .template-config-scope.template-gallery-grid .album-swiper .swiper-wrapper {
           display: grid !important;
-          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           gap: var(--template-gallery-gap) !important;
           transform: none !important;
         }
 
-        @media (min-width: 768px) {
-          .template-config-scope.template-gallery-grid .gallery-grid,
-          .template-config-scope.template-gallery-grid .album-grid,
-          .template-config-scope.template-gallery-grid .album-swiper .swiper-wrapper {
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-          }
-        }
 
         .template-config-scope.template-gallery-carousel .gallery-grid,
         .template-config-scope.template-gallery-carousel .album-grid,

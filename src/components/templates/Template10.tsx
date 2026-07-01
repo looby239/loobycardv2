@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import Lightbox from './Lightbox';
 
 interface TemplateProps {
   card: CardData;
@@ -244,6 +245,8 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
   const albumImages = card.album_images && card.album_images.length > 0 ? card.album_images : (previewMode ? ['/templates/template-10/assets/images/cover_photo.png'] : []);
 
   const mapIframeSrc = getMapIframeSrc(card);
+
+  const lightboxImages = albumImages;
 
   return (
     <div className="t10-wrapper">
@@ -536,12 +539,12 @@ export default function Template10({ card, previewMode = false }: TemplateProps)
       )}
 
       {/* Photo Lightbox Modal Overlay */}
-      <div className={`lightbox-overlay ${lightboxImg ? 'active' : ''}`} id="lightbox" onClick={(e) => { if (e.target === e.currentTarget) setLightboxImg(null); }}>
-        <button className="lightbox-close" onClick={() => setLightboxImg(null)}>×</button>
-        <div className="lightbox-content">
-          {lightboxImg && <img src={lightboxImg} alt="Photo Fullscreen" className="lightbox-img" id="lightbox-img" />}
-        </div>
-      </div>
+      <Lightbox
+        currentImage={lightboxImg}
+        images={lightboxImages}
+        onClose={() => setLightboxImg(null)}
+        onNavigate={setLightboxImg}
+      />
     </div>
   );
 }

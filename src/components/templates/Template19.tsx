@@ -511,16 +511,7 @@ export default function Template19({ card, previewMode = false }: TemplateProps)
                 </tbody>
               </table>
 
-              <div className="calendar-actions">
-                {card.map_url && (
-                  <a href={card.map_url} target="_blank" rel="noopener noreferrer" className="btn-add-calendar">
-                    Thêm vào lịch
-                  </a>
-                )}
-                <a href="#rsvp-section" className="btn-rsvp-scroll">
-                  XÁC NHẬN
-                </a>
-              </div>
+
             </div>
           )}
 

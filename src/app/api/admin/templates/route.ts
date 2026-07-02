@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import { CardData } from '@/types/card';
 import { TEMPLATE_CATALOG, getTemplateCatalogItem } from '@/lib/templateCatalog';
 import {
@@ -150,7 +153,16 @@ export async function GET() {
     if (error) throw error;
 
     const templates = ((data || []) as TemplateConfigRow[]).map(enrichTemplate);
-    return NextResponse.json({ success: true, templates });
+    return NextResponse.json(
+      { success: true, templates },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      },
+    );
   } catch (error: unknown) {
     console.error('GET /api/admin/templates error:', error);
     const message = error instanceof Error ? error.message : 'Server error';

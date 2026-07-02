@@ -166,7 +166,7 @@ export default function AdminTemplatesPage() {
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/templates');
+      const res = await fetch('/api/admin/templates', { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         const loadedTemplates = data.templates as TemplateConfig[];
@@ -233,6 +233,7 @@ export default function AdminTemplatesPage() {
     setSaving(templateId);
     try {
       const res = await fetch('/api/admin/templates', {
+        cache: 'no-store',
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: templateId, is_enabled: !currentValue }),
@@ -267,11 +268,13 @@ export default function AdminTemplatesPage() {
     try {
       await Promise.all([
         fetch('/api/admin/templates', {
+          cache: 'no-store',
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: updated[idx].id, sort_order: idx }),
         }),
         fetch('/api/admin/templates', {
+          cache: 'no-store',
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: updated[swapIdx].id, sort_order: swapIdx }),
@@ -317,6 +320,7 @@ export default function AdminTemplatesPage() {
     setSaving(templateId);
     try {
       await fetch('/api/admin/templates', {
+        cache: 'no-store',
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: templateId, thumbnail_url: null }),
@@ -336,6 +340,7 @@ export default function AdminTemplatesPage() {
     setSaving(template.id);
     try {
       const res = await fetch('/api/admin/templates', {
+        cache: 'no-store',
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -368,6 +373,7 @@ export default function AdminTemplatesPage() {
     setSaving(template.id);
     try {
       const res = await fetch(`/api/admin/templates?id=${encodeURIComponent(template.id)}`, {
+        cache: 'no-store',
         method: 'DELETE',
       });
       const data = await res.json();
@@ -404,6 +410,7 @@ export default function AdminTemplatesPage() {
     setSavingSample(true);
     try {
       const res = await fetch('/api/admin/templates', {
+        cache: 'no-store',
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: selectedTemplateId, sample_data }),

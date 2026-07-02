@@ -137,7 +137,7 @@ export default function TemplateCustomizerForm({
   const loadTemplates = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/templates');
+      const res = await fetch('/api/admin/templates', { cache: 'no-store' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || 'Khong the tai template');
       setTemplates(data.templates || []);
@@ -266,6 +266,7 @@ export default function TemplateCustomizerForm({
           };
 
       const res = await fetch('/api/admin/templates', {
+        cache: 'no-store',
         method: mode === 'new' ? 'POST' : 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

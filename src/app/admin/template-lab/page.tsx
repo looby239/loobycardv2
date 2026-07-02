@@ -78,7 +78,7 @@ export default function TemplateLabPage() {
   useEffect(() => {
     async function loadDbTemplates() {
       try {
-        const res = await fetch('/api/admin/templates');
+        const res = await fetch('/api/admin/templates', { cache: 'no-store' });
         const data = await res.json();
         if (data.success && data.templates && data.templates.length > 0) {
           // Map backend templates to Catalog format

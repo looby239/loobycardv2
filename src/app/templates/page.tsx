@@ -38,7 +38,15 @@ interface AdminTemplateConfig {
   preview_url?: string | null;
   is_enabled: boolean;
   sort_order: number;
+  updated_at?: string | null;
 }
+
+const buildThumbnailSrc = (src: string | null | undefined, updatedAt?: string | null) => {
+  const safeSrc = src || '/assets/images/template-10-thumbnail.png';
+  if (!updatedAt) return safeSrc;
+  const separator = safeSrc.includes('?') ? '&' : '?';
+  return `${safeSrc}${separator}v=${encodeURIComponent(updatedAt)}`;
+};
 
 // Fallback list (used before DB loads or if DB fails)
 const FALLBACK_TEMPLATES: Template[] = Object.entries(TEMPLATE_STATIC).map(([id, meta]) => ({
@@ -60,33 +68,49 @@ export default function TemplatesPage() {
 
   // Load enabled templates from admin config (sorted by sort_order)
   useEffect(() => {
-    fetch('/api/admin/templates')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success && data.templates?.length > 0) {
-          const enabled = (data.templates as AdminTemplateConfig[])
-            .filter(t => t.is_enabled)
-            .sort((a, b) => a.sort_order - b.sort_order)
-            .map(t => {
-              const meta = TEMPLATE_STATIC[t.id] || {
-                thumbnail: t.defaultThumbnail || '',
-                previewUrl: t.preview_url || `/template-preview/${t.id}`,
-                typeName: t.typeName || 'Thiệp cưới',
-              };
-              return {
-                id: t.id,
-                name: t.name || meta.typeName,
-                typeName: t.typeName || meta.typeName,
-                // Use admin-uploaded thumbnail if available, otherwise static fallback
-                thumbnail: t.thumbnail_url || t.defaultThumbnail || meta.thumbnail,
-                previewUrl: t.preview_url || meta.previewUrl,
-              };
-            });
-          if (enabled.length > 0) setTemplates(enabled);
-        }
-      })
-      .catch(() => { /* use fallback silently */ })
-      .finally(() => setLoading(false));
+    const loadTemplates = () => {
+      fetch('/api/templates/list', { cache: 'no-store' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.templates?.length > 0) {
+            const enabled = (data.templates as AdminTemplateConfig[])
+              .filter(t => t.is_enabled)
+              .sort((a, b) => a.sort_order - b.sort_order)
+              .map(t => {
+                const meta = TEMPLATE_STATIC[t.id] || {
+                  thumbnail: t.defaultThumbnail || '',
+                  previewUrl: t.preview_url || `/template-preview/${t.id}`,
+                  typeName: t.typeName || 'Thiệp cưới',
+                };
+                return {
+                  id: t.id,
+                  name: t.name || meta.typeName,
+                  typeName: t.typeName || meta.typeName,
+                  thumbnail: buildThumbnailSrc(t.thumbnail_url || t.defaultThumbnail || meta.thumbnail, t.updated_at),
+                  previewUrl: t.preview_url || meta.previewUrl,
+                };
+              });
+            if (enabled.length > 0) setTemplates(enabled);
+          }
+        })
+        .catch(() => { /* use fallback silently */ })
+        .finally(() => setLoading(false));
+    };
+
+    loadTemplates();
+    const intervalId = window.setInterval(loadTemplates, 5000);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadTemplates();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   const activeTemplate = templates[activeIdx] || templates[0];
@@ -313,6 +337,7 @@ export default function TemplatesPage() {
                           src={tpl.thumbnail}
                           alt={tpl.name}
                           className="w-full h-full object-cover"
+                          key={tpl.thumbnail}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = '/assets/images/template-10-thumbnail.png';
                           }}

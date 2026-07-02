@@ -89,33 +89,57 @@ export default function HomePage() {
   const [highlightThumbnails, setHighlightThumbnails] = useState<Array<{ id: string; name: string; image: string }>>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const buildThumbnailSrc = (src: string | null | undefined, updatedAt?: string | null) => {
+    const safeSrc = src || '/assets/images/template-10-thumbnail.png';
+    if (!updatedAt) return safeSrc;
+    const separator = safeSrc.includes('?') ? '&' : '?';
+    return `${safeSrc}${separator}v=${encodeURIComponent(updatedAt)}`;
+  };
+
   useEffect(() => {
-    fetch('/api/admin/templates')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success && data.templates?.length > 0) {
-          const sorted = [...data.templates]
-            .sort((a, b) => b.sort_order - a.sort_order)
-            .slice(0, 5)
-            .map(t => ({
-              id: t.id,
-              name: t.name || 'Mẫu thiệp',
-              image: t.thumbnail_url || t.defaultThumbnail || `/assets/images/${t.id}/preview.png`
-            }));
-          setHighlightThumbnails(sorted);
-        } else {
-          throw new Error('No templates');
-        }
-      })
-      .catch(() => {
-        setHighlightThumbnails([
-          { id: 'template-19', name: 'Minimalism Đỏ (Template 19)', image: '/assets/images/template-19/photo1.jpg' },
-          { id: 'template-18', name: 'Vườn Xuân Đỏ (Template 18)', image: '/assets/images/template-18/photo1.jpg' },
-          { id: 'template-17', name: 'Hoa Mộc Hồng (Template 17)', image: '/assets/images/template-17/photo1.jpg' },
-          { id: 'template-16', name: 'Thanh Diệp Xanh (Template 16)', image: '/assets/images/template-16/preview.png' },
-          { id: 'template-15', name: 'Thành Lộc & Minh Thư (Template 15)', image: '/assets/images/template-15/preview.png' }
-        ]);
-      });
+    const loadTemplates = () => {
+      fetch('/api/templates/list', { cache: 'no-store' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.templates?.length > 0) {
+            const sorted = [...data.templates]
+              .sort((a, b) => b.sort_order - a.sort_order)
+              .slice(0, 5)
+              .map(t => ({
+                id: t.id,
+                name: t.name || 'Mẫu thiệp',
+                image: buildThumbnailSrc(t.thumbnail_url || t.defaultThumbnail || `/assets/images/${t.id}/preview.png`, t.updated_at)
+              }));
+            setHighlightThumbnails(sorted);
+          } else {
+            throw new Error('No templates');
+          }
+        })
+        .catch(() => {
+          setHighlightThumbnails([
+            { id: 'template-19', name: 'Minimalism Đỏ (Template 19)', image: '/assets/images/template-19/photo1.jpg' },
+            { id: 'template-18', name: 'Vườn Xuân Đỏ (Template 18)', image: '/assets/images/template-18/photo1.jpg' },
+            { id: 'template-17', name: 'Hoa Mộc Hồng (Template 17)', image: '/assets/images/template-17/photo1.jpg' },
+            { id: 'template-16', name: 'Thanh Diệp Xanh (Template 16)', image: '/assets/images/template-16/preview.png' },
+            { id: 'template-15', name: 'Thành Lộc & Minh Thư (Template 15)', image: '/assets/images/template-15/preview.png' },
+          ]);
+        });
+    };
+
+    loadTemplates();
+    const intervalId = window.setInterval(loadTemplates, 5000);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadTemplates();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   useEffect(() => {
@@ -353,6 +377,7 @@ export default function HomePage() {
                         }`}
                     >
                       <img
+                        key={slide.image}
                         src={slide.image}
                         alt={slide.name}
                         className="w-full h-full object-cover animate-fade-in"

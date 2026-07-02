@@ -78,7 +78,7 @@ export async function sendPublishEmail(card: CardInfo) {
 
         <p>Chúng tôi đã đính kèm file ảnh QR Code gốc và file QR Code nền trong suốt (phục vụ in ấn/thiết kế phông nền) trong email này.</p>
         <p>Cảm ơn bạn đã tin dùng dịch vụ của LoobyCard. Chúc ngày trọng đại của bạn diễn ra tốt đẹp nhất!</p>
-        <p><strong>Liên hệ hỗ trợ 0844444913 (call/zalo)</strong></p>
+        <p><strong>Liên hệ hỗ trợ 0945019920 (call/zalo)</strong></p>
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
@@ -156,7 +156,7 @@ export async function sendDomainActivationEmail(card: CardInfo) {
 
         <p>Lưu ý: Mã QR Code này đã được tạo lại theo tên miền riêng mới của bạn. Vui lòng sử dụng mã QR Code đính kèm dưới đây để in ấn hoặc chia sẻ.</p>
         <p>Cảm ơn bạn đã tin dùng dịch vụ của LoobyCard. Chúc ngày trọng đại của bạn diễn ra tốt đẹp nhất!</p>
-        <p><strong>Liên hệ hỗ trợ 0844444913 (call/zalo)</strong></p>
+        <p><strong>Liên hệ hỗ trợ 0945019920 (call/zalo)</strong></p>
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>
@@ -254,7 +254,7 @@ export async function sendDemoEmail(demo: DemoEmailInfo) {
         </div>
 
         <p>Cảm ơn bạn đã sử dụng LoobyCard. Chúc ngày trọng đại của bạn diễn ra tốt đẹp nhất!</p>
-        <p><strong>Liên hệ hỗ trợ 0844444913 (call/zalo)</strong></p>
+        <p><strong>Liên hệ hỗ trợ 0945019920 (call/zalo)</strong></p>
         <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 15px 0;" />
         <p style="font-size: 12px; color: #6b7280; text-align: center;">Đây là email tự động từ hệ thống LoobyCard.com. Vui lòng không phản hồi email này.</p>
       </div>

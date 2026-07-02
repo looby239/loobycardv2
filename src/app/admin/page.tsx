@@ -428,7 +428,7 @@ export default function AdminCardsPage() {
 
   useEffect(() => {
     fetchCards();
-    fetch('/api/admin/templates')
+    fetch('/api/admin/templates', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         if (data.success && data.templates) {
